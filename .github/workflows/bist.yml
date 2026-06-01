@@ -1,8 +1,8 @@
-name: TradingView Full Haber Botu (Akıllı Bölmeli)
+name: TradingView Full Haber Botu (24/7 Hata Ayıklamalı)
 on:
   schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+    - cron: '*/15 * * * *' # 7/24 Her 15 dakikada bir çalışır
+  workflow_dispatch: # Elle test etmek için buton
 
 jobs:
   check-tv-news:
@@ -36,14 +36,15 @@ jobs:
           import html
           import requests
 
-          # 1. TradingView Vitrinini Çekme
+          print("Adım 1: TradingView'e bağlanılıyor...")
           url = "https://tr.tradingview.com/news-flow/"
-          scraper = cloudscraper.create_scraper()
+          scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False})
           
           try:
               response = scraper.get(url, timeout=30)
+              print(f"Sunucu Yanıt Kodu: {response.status_code}")
               if response.status_code != 200:
-                  print(f"Hata: TradingView'e erişilemedi. HTTP {response.status_code}")
+                  print("KRİTİK HATA: TradingView bulut sunucusunu engelledi (Cloudflare Captcha).")
                   exit(1)
           except Exception as e:
               print(f"Bağlantı hatası: {e}")
@@ -53,13 +54,18 @@ jobs:
 
           token = os.environ.get('TELEGRAM_TOKEN')
           chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if not token or not chat_id:
+              print("KRİTİK HATA: GitHub Secrets içine TELEGRAM_TOKEN veya TELEGRAM_CHAT_ID eklenmemiş!")
+              exit(1)
 
           found_news_links = []
+          print("Adım 2: Sayfadaki haber linkleri taranıyor...")
           
-          # 2. Sayfadaki güncel haberleri bulma
           for a in soup.find_all('a', href=True):
               link = a['href']
-              if '/news/' in link:
+              # Linkin içinde news veya haber kelimesi geçiyorsa yakala
+              if '/news/' in link or '/haber/' in link:
                   title = a.get_text(separator=" ", strip=True)
                   if len(title) < 15: continue
                       
@@ -72,7 +78,10 @@ jobs:
                   if len(found_news_links) >= 20: 
                       break
 
-          # 3. Önbellek (Cache) Kontrolü
+          print(f"Bulunan geçerli haber sayısı: {len(found_news_links)}")
+          if len(found_news_links) == 0:
+              print("UYARI: Sayfaya erişildi ancak haber linki bulunamadı. HTML yapısı farklı gelmiş olabilir.")
+
           cache_file = "tv_news_cache.json"
           old_news = []
           if os.path.exists(cache_file):
@@ -86,15 +95,17 @@ jobs:
           news_to_process = []
 
           if not old_news:
-              news_to_process = found_news_links[:3] # İlk kurulumda sadece 3 tane çek
+              print("Adım 3: İlk kurulum algılandı. Sadece son 3 haber test için gönderilecek.")
+              news_to_process = found_news_links[:3]
           else:
               for news in reversed(found_news_links): 
                   if news['title'] not in old_news:
                       news_to_process.append(news)
+              print(f"Gönderilecek YENİ haber sayısı: {len(news_to_process)}")
 
-          # 4. HABER İÇERİĞİ VE AKILLI BÖLME İŞLEMİ
           for news in news_to_process:
               try:
+                  print(f"İçeriğine giriliyor: {news['title'][:30]}...")
                   art_resp = scraper.get(news['link'], timeout=15)
                   art_soup = BeautifulSoup(art_resp.text, 'html.parser')
                   
@@ -105,79 +116,56 @@ jobs:
                   full_text = "\n\n".join([p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 30])
                   
                   if not full_text:
-                      full_text = "Haber metni bu sağlayıcıdan tam olarak çekilemedi. Lütfen orijinal bağlantıdan inceleyin."
+                      full_text = "Haber metni çekilemedi. Lütfen orijinal bağlantıdan inceleyin."
                   
-                  # METNİ CÜMLE VEYA PARAGRAF SONUNDAN BÖLME ALGORİTMASI
                   limit = 3500
                   text_chunks = []
                   temp_text = full_text
                   
                   while len(temp_text) > limit:
-                      # Metni güvenli bir yerden bölmek için sırayla: Paragraf -> Nokta -> Boşluk arıyoruz
                       split_at = temp_text.rfind('\n\n', 0, limit)
-                      if split_at == -1:
-                          split_at = temp_text.rfind('. ', 0, limit)
-                      if split_at == -1:
-                          split_at = temp_text.rfind(' ', 0, limit)
-                      if split_at == -1:
-                          split_at = limit # Hiçbir şey bulunamazsa kaba kuvvetle böl
+                      if split_at == -1: split_at = temp_text.rfind('. ', 0, limit)
+                      if split_at == -1: split_at = temp_text.rfind(' ', 0, limit)
+                      if split_at == -1: split_at = limit
                       
-                      # Eğer noktadan böldüysek noktayı ilk parçaya dahil et
-                      if temp_text[split_at:split_at+2] == '. ':
-                          split_at += 1
+                      if temp_text[split_at:split_at+2] == '. ': split_at += 1
                           
                       text_chunks.append(temp_text[:split_at].strip())
                       temp_text = temp_text[split_at:].strip()
                       
-                  if temp_text:
-                      text_chunks.append(temp_text)
+                  if temp_text: text_chunks.append(temp_text)
 
-                  # BÖLÜNMÜŞ PARÇALARI SIFIR HATAYLA TELEGRAM'A GÖNDERME
                   for i, chunk in enumerate(text_chunks):
                       if len(text_chunks) == 1:
-                          # Eğer metin kısa ve tek parçaysa normal formatta at
                           msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>{html.escape(chunk)}\n\n<a href='{news['link']}'>[Orijinal Kaynağa Git]</a></blockquote>"
                       else:
-                          # Eğer metin bölündüyse parçaları birbirine bağlayacak şekilde at
                           if i == 0:
-                              # İlk parça (Başlık içerir)
                               msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>{html.escape(chunk)} <i>\n\n(Devamı ⬇️)</i></blockquote>"
                           elif i == len(text_chunks) - 1:
-                              # Son parça (Link içerir)
                               msg = f"<blockquote>{html.escape(chunk)}\n\n<a href='{news['link']}'>[Orijinal Kaynağa Git]</a></blockquote>"
                           else:
-                              # Ara parça
                               msg = f"<blockquote>{html.escape(chunk)} <i>\n\n(Devamı ⬇️)</i></blockquote>"
                       
                       tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
-                      payload = {
-                          "chat_id": chat_id, 
-                          "text": msg, 
-                          "parse_mode": "HTML",
-                          "link_preview_options": {"is_disabled": True}
-                      }
+                      payload = {"chat_id": chat_id, "text": msg, "parse_mode": "HTML", "link_preview_options": {"is_disabled": True}}
                       
-                      requests.post(tg_url, json=payload, timeout=10)
-                      time.sleep(2) # Parçalar arasında grubun spama düşmemesi için bekleme
+                      tg_resp = requests.post(tg_url, json=payload, timeout=10)
+                      if tg_resp.status_code != 200:
+                          print(f"TELEGRAM GÖNDERİM HATASI: {tg_resp.text}")
+                      
+                      time.sleep(2)
                       
               except Exception as e:
-                  # Olası bir bağlantı hatasında botun çökmemesi için kurtarma mesajı
-                  msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>Haber detayları çekilirken geçici bir bağlantı sorunu yaşandı.\n\n<a href='{news['link']}'>[Orijinal Kaynağa Git]</a></blockquote>"
-                  requests.post(f"https://api.telegram.org/bot{token}/sendMessage", json={"chat_id": chat_id, "text": msg, "parse_mode": "HTML", "link_preview_options": {"is_disabled": True}})
+                  print(f"Haber işlenirken hata: {e}")
 
-              time.sleep(3) # Diğer habere geçmeden önce bekle
-
-          if not news_to_process and old_news:
-              print("Yeni haber bulunamadı. Bekleniyor.")
-
-          # Hafızayı yenile
           with open(cache_file, "w") as f:
               json.dump(new_saved_news, f)
+          print("İşlem tamamlandı, hafıza güncellendi.")
 
       - name: Cache Güncelle
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add tv_news_cache.json
-          git commit -m "TV son 20 haber önbelleği güncellendi [skip ci]" || echo "Değişiklik yok"
+          git commit -m "TV önbellek güncellendi [skip ci]" || echo "Değişiklik yok"
           git push
