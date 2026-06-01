@@ -17,54 +17,55 @@ jobs:
           python-version: '3.10'
 
       - name: Gerekli Kütüphaneleri Yükle
-        run: pip install requests cloudscraper beautifulsoup4
+        run: pip install requests beautifulsoup4 lxml
 
-      - name: TradingView Kazı ve Telegram'a At
+      - name: Haberleri Çek ve Telegram'a At
         shell: python
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          import cloudscraper
-          from bs4 import BeautifulSoup
           import requests
+          from bs4 import BeautifulSoup
           import os
           import json
+          import urllib.parse
 
-          # 1. TradingView Engeli Aşarak Sayfayı Çekme
-          url = "https://tr.tradingview.com/news-flow/?symbol=BIST:ASELS"
-          scraper = cloudscraper.create_scraper()
-          response = scraper.get(url)
-
-          if response.status_code != 200:
-              print(f"Hata: TradingView sayfasına erişilemedi. Kod: {response.status_code}")
+          # 1. Google Haberler RSS üzerinden ASELSAN haberlerini çekme
+          # Bu yöntem TradingView'in dinamik yapısına göre çok daha kararlı ve engellenme riski düşüktür.
+          query = "ASELSAN"
+          url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}&hl=tr&gl=TR&ceid=TR:tr"
+          
+          try:
+              response = requests.get(url, timeout=30)
+              response.raise_for_status()
+          except Exception as e:
+              print(f"Hata: Haber kaynağına erişilemedi: {e}")
               exit(1)
 
-          # 2. HTML'i Ayrıştırma
-          soup = BeautifulSoup(response.text, 'html.parser')
-          
-          # TradingView haber kartlarını bul (Haber başlıkları genellikle 'card-title' içeren sınıflardadır)
-          # Sitenin yapısına göre en garanti seçicileri hedefliyoruz
-          news_items = soup.find_all('div', class_=lambda x: x and 'card' in x and 'title' in x) or soup.find_all('a', class_=lambda x: x and 'title' in x)
-          
-          # Eğer yukarıdaki seçiciler boş dönerse genel link etiketlerini dene
-          if not news_items:
-              news_items = [a for a in soup.find_all('a') if 'news' in a.get('href', '')]
+          # 2. XML'i Ayrıştırma
+          soup = BeautifulSoup(response.content, 'xml')
+          items = soup.find_all('item')
 
-          token = os.environ['TELEGRAM_TOKEN']
-          chat_id = os.environ['TELEGRAM_CHAT_ID']
+          token = os.environ.get('TELEGRAM_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
           
+          if not token or not chat_id:
+              print("Hata: TELEGRAM_TOKEN veya TELEGRAM_CHAT_ID eksik!")
+              exit(1)
+
           def telegram_mesaj_gonder(text):
               tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
-              requests.post(tg_url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
+              try:
+                  requests.post(tg_url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}, timeout=10)
+              except Exception as e:
+                  print(f"Telegram gönderme hatası: {e}")
 
           # 3. Haberleri İşleme Mantığı
           found_news = []
-          for item in news_items[:3]: # Sadece son 3 haberi al
-              title = item.get_text().strip()
-              link = item.get('href', '')
-              if link and not link.startswith('http'):
-                  link = "https://tr.tradingview.com" + link
+          for item in items[:10]: # Son 10 haberi kontrol et
+              title = item.title.text
+              link = item.link.text
               if title and link:
                   found_news.append((title, link))
 
@@ -72,32 +73,44 @@ jobs:
           cache_file = "last_news.json"
           old_news = []
           if os.path.exists(cache_file):
-              with open(cache_file, "r") as f:
-                  old_news = json.load(f)
+              try:
+                  with open(cache_file, "r") as f:
+                      old_news = json.load(f)
+              except:
+                  old_news = []
 
           new_saved_news = [title for title, _ in found_news]
 
           # Eğer hafıza dosyası yoksa (İlk çalıştırma), son 3 haberi gruba atar
           if not old_news:
               if found_news:
-                  telegram_mesaj_gonder("🚀 *ASELSAN Haber Takip Botu Aktif!* Son 3 Haber Getiriliyor:\n" + "—"*15)
-                  for title, link in found_news:
+                  telegram_mesaj_gonder("🚀 *ASELSAN Haber Takip Botu Aktif!* Son Haberler Getiriliyor:\n" + "—"*15)
+                  for title, link in found_news[:3]:
                       msg = f"🔔 *ASELSAN Haber:*\n\n{title}\n\n[Detayları Gör]({link})"
                       telegram_mesaj_gonder(msg)
               else:
-                  telegram_mesaj_gonder("⚠️ TradingView'den şu an haber başlıkları çekilemedi, seçiciler güncellenmeli.")
+                  print("Haber bulunamadı.")
           else:
               # Sonraki çalıştırmalarda yeni haber kontrolü yapar
               has_new = False
-              for title, link in found_news:
+              # Tersten kontrol et ki en yeni haber en son gönderilsin (isteğe bağlı)
+              for title, link in reversed(found_news[:5]): 
                   if title not in old_news:
                       msg = f"🔔 *YENİ ASELSAN HABERİ:*\n\n{title}\n\n[Detayları Gör]({link})"
                       telegram_mesaj_gonder(msg)
                       has_new = True
               
               if not has_new:
-                  telegram_mesaj_gonder("ℹ️ *ASELSAN:* Yeni bir haber bulunmuyor.")
+                  print("Yeni haber bulunamadı.")
 
-          # Yeni listeyi hafızaya kaydet (GitHub Actions ephemeral olduğu için bu adımı yerel testler için de koruyoruz)
+          # Yeni listeyi hafızaya kaydet
           with open(cache_file, "w") as f:
               json.dump(new_saved_news, f)
+
+      - name: Cache Güncelle
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add last_news.json
+          git commit -m "Haber önbelleği güncellendi [skip ci]" || echo "Değişiklik yok"
+          git push
