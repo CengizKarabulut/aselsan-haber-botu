@@ -1,4 +1,4 @@
-name: TradingView Full Haber Botu (Sıkı Yönetim)
+name: TradingView Full Haber Botu (Stabil Sürüm)
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -54,7 +54,6 @@ jobs:
 
           found_news_links = []
           yasakli_basliklar = ["giriş yapın", "özel haber", "premium"]
-          # Menü yazıları ve yasal uyarıları kesin olarak filtreliyoruz
           yasakli_icerikler = ["ICE Data Services", "FactSet", "Telif Hakkı", "CUSIP", "SEC dosyaları", "TradingView, Inc", "Tüm hakları saklıdır"]
 
           with sync_playwright() as p:
@@ -74,15 +73,17 @@ jobs:
                   for a in soup.find_all('a', href=True):
                       link = a['href']
                       
-                      # KESİN KURAL: Sadece TradingView içindeki haber makalelerine gir. Dış siteleri ve menüleri reddet!
-                      if link.startswith('/news/') and len(link) > 25:
-                          # Piyasalar, kripto vs. gibi kategori sayfalarına tıklamayı engelle
-                          if any(k in link for k in ['/markets/', '/crypto/', '/stocks/', '/all/', '/currencies/', '/authors/']):
+                      # KURAL GÜNCELLENDİ: Linkin içinde news veya haber geçmesi yeterli.
+                      if '/news/' in link or '/haber/' in link:
+                          # Ancak Piyasalar, Kripto, Yazarlar gibi kategori ve menü sayfalarına tıklamayı engelle
+                          if any(k in link for k in ['/markets/', '/crypto/', '/stocks/', '/all/', '/currencies/', '/authors/', '/symbols/']):
                               continue
                               
-                          full_link = "https://tr.tradingview.com" + link
+                          # Link http ile başlamıyorsa, sitenin ana domainini başına ekle
+                          full_link = link if link.startswith('http') else "https://tr.tradingview.com" + link
                           title = a.get_text(separator=" ", strip=True)
                           
+                          # Çok kısa kelimeleri (reklam, menü vb) ve yasaklı başlıkları filtrele
                           if len(title) < 15 or any(yasak in title.lower() for yasak in yasakli_basliklar):
                               continue
                               
@@ -153,7 +154,6 @@ jobs:
 
                       for i, chunk in enumerate(text_chunks):
                           if len(text_chunks) == 1:
-                              # Link metni özellikle değiştirildi, botun nereye gittiğini görün
                               msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>{html.escape(chunk)}\n\n<a href='{news['link']}'>[TradingView'de Oku]</a></blockquote>"
                           else:
                               if i == 0:
