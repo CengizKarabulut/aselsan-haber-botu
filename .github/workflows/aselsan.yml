@@ -20,6 +20,7 @@ jobs:
         run: pip install requests feedparser
 
       - name: Haberleri Kontrol Et ve Telegram'a At
+        shell: python # 👈 GitHub'a bu bloğun Python olduğunu söyleyen kritik satır!
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -35,7 +36,7 @@ jobs:
           feed = feedparser.parse(url)
           
           now = datetime.now(timezone.utc)
-          # Son 17 dakika içinde yayınlanan haberleri filtrele (Gecikme payı dahil)
+          # Son 17 dakika içinde yayınlanan haberleri filtrele
           time_threshold = now - timedelta(minutes=17)
 
           token = os.environ['TELEGRAM_TOKEN']
