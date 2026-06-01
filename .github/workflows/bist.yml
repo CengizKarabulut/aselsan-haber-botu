@@ -1,7 +1,7 @@
-name: BIST Tüm Canlı Haber Botu
+name: BIST Canlı Haber Botu
 on:
   schedule:
-    - cron: '*/15 6-16 * * 1-5' # Hafta içi borsa saatlerinde her 15 dakikada bir çalışır
+    - cron: '*/15 6-16 * * 1-5' # Hafta içi 09:00 - 19:00 arası her 15 dk'da bir
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       - name: Gerekli Kütüphaneleri Yükle
         run: pip install requests beautifulsoup4 lxml
 
-      - name: BIST Haberlerini Çek ve Telegram'a At
+      - name: Haberleri Çek ve Telegram'a At
         shell: python
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -33,9 +33,11 @@ jobs:
           import os
           import json
           import urllib.parse
+          import time
+          import html
 
-          # Tüm BIST hisselerini kapsayacak genel borsa araması
-          query = '"Borsa İstanbul" OR "KAP Bildirimi" OR "Hisse Haberleri"'
+          # BIST ve şirket haberlerini tarayan genel sorgu
+          query = '"Borsa İstanbul" OR "KAP Bildirimi" OR "Hisse"'
           url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}&hl=tr&gl=TR&ceid=TR:tr"
           
           try:
@@ -53,15 +55,27 @@ jobs:
 
           def telegram_mesaj_gonder(text):
               tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
-              requests.post(tg_url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}, timeout=10)
+              # parse_mode HTML olarak değiştirildi!
+              requests.post(tg_url, json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}, timeout=10)
+              time.sleep(2) # Telegram spam engeline takılmamak için 2 saniye bekleme
 
           found_news = []
-          # Genel havuzdan en güncel 15 haberi kontrol et
-          for item in items[:15]:
-              title = item.title.text
-              link = item.link.text
+          # Tam 20 haberi tarıyoruz
+          for item in items[:20]:
+              title = item.title.text if item.title else ""
+              link = item.link.text if item.link else ""
+              
+              # Haber özetini çekip HTML etiketlerinden temizliyoruz
+              raw_desc = item.description.text if item.description else ""
+              desc_soup = BeautifulSoup(raw_desc, 'html.parser')
+              summary = desc_soup.get_text(separator=' ', strip=True)
+              
+              # Özeti çok uzunsa kısaltıyoruz (Telegram'da şık durması için)
+              if len(summary) > 250:
+                  summary = summary[:247] + "..."
+                  
               if title and link:
-                  found_news.append((title, link))
+                  found_news.append({'title': title, 'link': link, 'summary': summary})
 
           cache_file = "bist_news_cache.json"
           old_news = []
@@ -72,24 +86,28 @@ jobs:
               except:
                   old_news = []
 
-          new_saved_news = [title for title, _ in found_news]
+          # Yeni kaydedilecek 20 haberin başlıkları
+          new_saved_news = [news['title'] for news in found_news]
 
           if not old_news:
-              if found_news:
-                  telegram_mesaj_gonder("🚀 *BIST TÜM Haber Takip Botu Aktif!* Güncel Akış Başlatıldı.\n" + "—"*15)
-                  for title, link in found_news[:3]:
-                      msg = f"🔔 *BIST Gelişme:*\n\n{title}\n\n[Detayları Gör]({link})"
-                      telegram_mesaj_gonder(msg)
+              telegram_mesaj_gonder("<b>🚀 BIST Haber Botu Aktif!</b>\n<blockquote>Sistem başlatıldı, yeni haberler düştükçe bu formatta gönderilecektir.</blockquote>")
+              # İlk kurulumda grubu 20 mesajla spamlamamak için sadece son 3'ünü atıyoruz, ama 20'sini hafızaya alıyoruz.
+              for news in found_news[:3]:
+                  # GÖRSELDEKİ FORMAT (HTML BOLD ve BLOCKQUOTE)
+                  msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>{html.escape(news['summary'])}\n\n<a href='{news['link']}'>[Haberi Oku]</a></blockquote>"
+                  telegram_mesaj_gonder(msg)
           else:
               has_new = False
-              for title, link in reversed(found_news[:8]): 
-                  if title not in old_news:
-                      msg = f"🔔 *YENİ BIST GELİŞMESİ:*\n\n{title}\n\n[Detayları Gör]({link})"
+              # Tersten gönderiyoruz ki en yeni haber en son (en altta) düşsün
+              for news in reversed(found_news): 
+                  if news['title'] not in old_news:
+                      # GÖRSELDEKİ FORMAT
+                      msg = f"<b>{html.escape(news['title'])}</b>\n<blockquote>{html.escape(news['summary'])}\n\n<a href='{news['link']}'>[Haberi Oku]</a></blockquote>"
                       telegram_mesaj_gonder(msg)
                       has_new = True
               
               if not has_new:
-                  print("Yeni borsa haberi bulunamadı.")
+                  print("Yeni haber bulunamadı.")
 
           with open(cache_file, "w") as f:
               json.dump(new_saved_news, f)
@@ -99,5 +117,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add bist_news_cache.json
-          git commit -m "Borsa önbelleği güncellendi [skip ci]" || echo "Değişiklik yok"
+          git commit -m "Son 20 haber önbelleği güncellendi [skip ci]" || echo "Değişiklik yok"
           git push
