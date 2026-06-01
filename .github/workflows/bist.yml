@@ -1,4 +1,4 @@
-name: TradingView Full Haber Botu (Filtreli)
+name: TradingView Full Haber Botu (Filtreli + Loglu)
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -41,6 +41,11 @@ jobs:
           token = os.environ.get('TELEGRAM_TOKEN')
           chat_id = os.environ.get('TELEGRAM_CHAT_ID')
 
+          print("--- SİSTEM BAŞLATILDI ---")
+          if not token or not chat_id:
+              print("KRİTİK HATA: Telegram Token veya Chat ID eksik!")
+              exit(1)
+
           cache_file = "tv_news_cache.json"
           old_news = []
           if os.path.exists(cache_file):
@@ -51,16 +56,11 @@ jobs:
                   old_news = []
 
           found_news_links = []
-          news_to_process = []
-          new_saved_news = []
-
-          # İSTENMEYEN KELİMELER (BAŞLIK İÇİN)
           yasakli_basliklar = ["giriş yapın", "özel haber", "premium"]
-          
-          # İSTENMEYEN KELİMELER (İÇERİK - FOOTER İÇİN)
           yasakli_icerikler = ["ICE Data Services", "FactSet", "Telif Hakkı", "CUSIP", "SEC dosyaları", "TradingView, Inc"]
 
           with sync_playwright() as p:
+              print("Adım 1: Tarayıcı açılıyor, TradingView'e bağlanılıyor...")
               browser = p.chromium.launch(headless=True)
               context = browser.new_context(
                   user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -70,82 +70,81 @@ jobs:
 
               try:
                   page.goto("https://tr.tradingview.com/news-flow/", timeout=60000, wait_until="domcontentloaded")
-                  page.wait_for_timeout(5000) 
-                  
+                  page.wait_for_timeout(5000)
                   soup = BeautifulSoup(page.content(), 'html.parser')
-                  
+
                   for a in soup.find_all('a', href=True):
                       link = a['href']
                       if '/news/' in link or '/haber/' in link:
                           title = a.get_text(separator=" ", strip=True)
-                          
-                          # KISA VEYA ÜCRETLİ HABERLERİ FİLTRELE (Giriş yapın vb.)
-                          if len(title) < 15 or any(yasak in title.lower() for yasak in yasakli_basliklar): 
+                          if len(title) < 15 or any(yasak in title.lower() for yasak in yasakli_basliklar):
                               continue
-                              
                           if not link.startswith('http'):
                               link = "https://tr.tradingview.com" + link
-                              
                           if not any(n['link'] == link for n in found_news_links):
                               found_news_links.append({'title': title, 'link': link})
-                              
-                          if len(found_news_links) >= 20: 
+                          if len(found_news_links) >= 20:
                               break
-                              
               except Exception as e:
                   print(f"Ana sayfa yükleme hatası: {e}")
                   browser.close()
                   exit(1)
-              
+
+              print(f"Adım 2: Sayfada {len(found_news_links)} adet geçerli haber bulundu.")
+
               new_saved_news = [n['title'] for n in found_news_links]
+              news_to_process = []
 
               if not old_news:
+                  print("Adım 3: İlk kurulum algılandı. Test için 3 haber seçiliyor.")
                   news_to_process = found_news_links[:3]
               else:
-                  for news in reversed(found_news_links): 
+                  for news in reversed(found_news_links):
                       if news['title'] not in old_news:
                           news_to_process.append(news)
 
-              # HABER DETAYLARININ İÇİNE GİRME BÖLÜMÜ
+              print(f"Adım 4: Gönderilecek YENİ haber sayısı: {len(news_to_process)}")
+
+              if len(news_to_process) == 0:
+                  print("BİLGİ: Sitede yeni bir haber yok. Telegram'a mesaj atılmayacak ve sessizce kapanacak.")
+
               for news in news_to_process:
+                  print(f"İşleniyor: {news['title'][:40]}...")
                   try:
                       page.goto(news['link'], timeout=45000, wait_until="domcontentloaded")
                       page.wait_for_timeout(3000)
                       art_soup = BeautifulSoup(page.content(), 'html.parser')
-                      
+
                       paragraphs = art_soup.select('article p, div[class*="body"] p')
                       if not paragraphs:
                           paragraphs = art_soup.find_all('p')
-                      
-                      # ÇÖP PARAGRAFLARI AYIKLAMA İŞLEMİ
+
                       temiz_paragraflar = []
                       for p_tag in paragraphs:
                           metin = p_tag.get_text(strip=True)
-                          # Eğer paragraf çok kısaysa veya yasal footer (Telif vb.) içeriyorsa yoksay
                           if len(metin) > 30 and not any(yasak in metin for yasak in yasakli_icerikler):
                               temiz_paragraflar.append(metin)
-                      
+
                       full_text = "\n\n".join(temiz_paragraflar)
-                      
-                      # Eğer temizlendikten sonra geriye hiçbir şey kalmadıysa
+
                       if not full_text:
                           full_text = "Haberin tam metni şifreli (Premium) olduğu için veya görselden ibaret olduğu için çekilemedi. Orijinal bağlantıdan detaylara ulaşabilirsiniz."
-                          
+
                       limit = 3500
                       text_chunks = []
                       temp_text = full_text
-                      
+
                       while len(temp_text) > limit:
                           split_at = temp_text.rfind('\n\n', 0, limit)
                           if split_at == -1: split_at = temp_text.rfind('. ', 0, limit)
                           if split_at == -1: split_at = temp_text.rfind(' ', 0, limit)
                           if split_at == -1: split_at = limit
-                          
+
                           if temp_text[split_at:split_at+2] == '. ': split_at += 1
-                              
+
                           text_chunks.append(temp_text[:split_at].strip())
                           temp_text = temp_text[split_at:].strip()
-                          
+
                       if temp_text: text_chunks.append(temp_text)
 
                       for i, chunk in enumerate(text_chunks):
@@ -158,20 +157,29 @@ jobs:
                                   msg = f"<blockquote>{html.escape(chunk)}\n\n<a href='{news['link']}'>[Orijinal Kaynağa Git]</a></blockquote>"
                               else:
                                   msg = f"<blockquote>{html.escape(chunk)} <i>\n\n(Devamı ⬇️)</i></blockquote>"
-                          
+
                           tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
                           payload = {"chat_id": chat_id, "text": msg, "parse_mode": "HTML", "link_preview_options": {"is_disabled": True}}
-                          requests.post(tg_url, json=payload, timeout=10)
-                          time.sleep(2)
                           
+                          tg_resp = requests.post(tg_url, json=payload, timeout=10)
+                          
+                          # TELEGRAM GÖNDERİMİ BAŞARILI MI KONTROLÜ
+                          if tg_resp.status_code != 200:
+                              print(f"TELEGRAM GÖNDERİM HATASI: {tg_resp.text}")
+                          else:
+                              print("-> Telegram'a başarıyla gönderildi!")
+                              
+                          time.sleep(2)
+
                   except Exception as e:
                       print(f"Haber çekme hatası: {e}")
-                      
+
               browser.close()
 
           if new_saved_news:
               with open(cache_file, "w") as f:
                   json.dump(new_saved_news, f)
+              print("Hafıza güncellendi. İşlem Bitti.")
 
       - name: Cache Güncelle
         run: |
