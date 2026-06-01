@@ -52,8 +52,6 @@ jobs:
               except:
                   old_news = []
 
-          found_news_links = []
-          yasakli_basliklar = ["giriş yapın", "özel haber", "premium"]
           yasakli_icerikler = ["ICE Data Services", "FactSet", "Telif Hakkı", "CUSIP", "SEC dosyaları", "TradingView, Inc", "Tüm hakları saklıdır"]
 
           with sync_playwright() as p:
@@ -66,58 +64,65 @@ jobs:
               page = context.new_page()
 
               try:
-                  # ÇÖZÜM BURADA: Sitenin tamamen susmasını değil, sadece iskeletin yüklenmesini bekle (domcontentloaded)
-                  page.goto("https://tr.tradingview.com/news-flow/", timeout=60000, wait_until="domcontentloaded")
+                  # Sadece DOM iskeleti yüklenene kadar bekle
+                  page.goto("https://tr.tradingview.com/news-flow/", timeout=30000, wait_until="domcontentloaded")
+                  page.wait_for_timeout(3000)
                   
-                  # Sitenin arka planı hiç susmasa bile, ekranda bize lazım olan ilk "haber" linki belirene kadar bekle
-                  print("Haberlerin ekrana düşmesi bekleniyor...")
-                  page.wait_for_selector('a[href*="/news/"]', timeout=20000)
+                  # Ekrandaki gizli haberleri uyandırmak için hafifçe aşağı kaydır
+                  page.evaluate("window.scrollBy(0, 1000)")
                   page.wait_for_timeout(2000)
-                  
-                  # Ekrandaki gizli haberleri tetiklemek için biraz aşağı kaydır
-                  page.evaluate("window.scrollBy(0, 1500)")
-                  page.wait_for_timeout(2000)
-
-                  # Playwright'ın seçicisi ile haber linklerini bul
-                  links = page.query_selector_all('a[href*="/news/"]')
-                  
-                  for a in links:
-                      href = a.get_attribute('href')
-                      
-                      if any(k in href for k in ['/markets/', '/crypto/', '/stocks/', '/all/', '/currencies/', '/authors/', '/symbols/']):
-                          continue
-                          
-                      full_link = href if href.startswith('http') else "https://tr.tradingview.com" + href
-                      
-                      raw_text = a.inner_text().strip()
-                      lines = [line.strip() for line in raw_text.split('\n') if len(line.strip()) > 10]
-                      
-                      if not lines:
-                          continue
-                          
-                      title = max(lines, key=len)
-                      
-                      if len(title) < 15 or any(yasak in title.lower() for yasak in yasakli_basliklar):
-                          continue
-                          
-                      if not any(n['link'] == full_link for n in found_news_links):
-                          found_news_links.append({'title': title, 'link': full_link})
-                          
-                      if len(found_news_links) >= 20:
-                          break
-                          
               except Exception as e:
-                  print(f"Ana sayfa yükleme hatası: {e}")
-                  browser.close()
-                  exit(1)
+                  print(f"Uyarı: Sayfa tam yüklenmemiş olabilir ama işleme devam ediliyor... ({e})")
 
-              print(f"Adım 2: Sayfada {len(found_news_links)} adet temiz haber bulundu.")
+              print("Adım 2: X-Ray taraması ile haberler ayıklanıyor...")
+              
+              # BOTUN KÖR NOKTASINI ÇÖZEN JAVASCRIPT X-RAY KODU
+              found_news_links = page.evaluate('''() => {
+                  let results = [];
+                  let links = document.querySelectorAll('a[href*="/news/"]');
+                  let yasakli = ["giriş yapın", "özel haber", "premium"];
+                  
+                  for (let a of links) {
+                      let href = a.getAttribute('href');
+                      if (href.includes('/markets/') || href.includes('/crypto/') || href.includes('/stocks/') || href.includes('/all/') || href.includes('/authors/') || href.includes('/symbols/')) continue;
+                      
+                      // HAYALET LİNK ÇÖZÜMÜ: Link boşsa (overlay ise), onu kapsayan dış kutunun metnini al
+                      let text = a.innerText.trim();
+                      if (!text || text.length < 10) {
+                          text = a.parentElement ? a.parentElement.innerText.trim() : "";
+                      }
+                      if (!text || text.length < 10) {
+                          text = a.textContent.trim(); 
+                      }
+                      
+                      // Metni satır satır ayırıp anlamsız kısa kelimeleri (saat, tarih, kanal adı) ele
+                      let lines = text.split('\\n').map(l => l.trim()).filter(l => l.length > 10);
+                      if (lines.length === 0) continue;
+                      
+                      // Kalan satırlar içindeki en uzun cümlenin "Başlık" olma ihtimali %99'dur
+                      let title = lines.reduce((longest, current) => current.length > longest.length ? current : longest, "");
+                      
+                      let isYasak = yasakli.some(y => title.toLowerCase().includes(y));
+                      
+                      if (title.length > 15 && !isYasak) {
+                          let full_link = href.startsWith('http') ? href : "https://tr.tradingview.com" + href;
+                          // Eğer bu link listeye henüz eklenmediyse ekle (Tekrarları önler)
+                          if (!results.some(r => r.link === full_link)) {
+                              results.push({title: title, link: full_link});
+                          }
+                      }
+                      if (results.length >= 25) break;
+                  }
+                  return results;
+              }''')
+
+              print(f"-> Sayfada X-Ray ile {len(found_news_links)} adet GERÇEK haber tespit edildi.")
 
               new_saved_news = [n['title'] for n in found_news_links]
               news_to_process = []
 
               if not old_news:
-                  print("Adım 3: İlk çalıştırma. 10 yeni haber listeye alınıyor.")
+                  print("Adım 3: İlk çalıştırma. Sisteme 10 yeni haber atılıyor.")
                   news_to_process = found_news_links[:10]
               else:
                   for news in reversed(found_news_links):
@@ -127,11 +132,15 @@ jobs:
               print(f"Adım 4: Telegram'a atılacak YENİ haber sayısı: {len(news_to_process)}")
 
               for news in news_to_process:
-                  print(f"-> {news['title'][:40]}...")
+                  print(f"İçeriği Çekiliyor: {news['title'][:40]}...")
                   try:
-                      # Aynı şekilde detay sayfalarında da aşırı beklemeyi iptal ettik
-                      page.goto(news['link'], timeout=45000, wait_until="domcontentloaded")
-                      page.wait_for_timeout(2500)
+                      try:
+                          # Timeout olursa patlamaması için ekstra koruma
+                          page.goto(news['link'], timeout=20000, wait_until="domcontentloaded")
+                          page.wait_for_timeout(2000)
+                      except Exception:
+                          pass # Zaman aşımı olsa bile haber metni genelde yüklenmiş olur, devam et.
+
                       art_soup = BeautifulSoup(page.content(), 'html.parser')
 
                       paragraphs = art_soup.select('article p, div[class*="body"] p')
@@ -147,7 +156,7 @@ jobs:
                       full_text = "\n\n".join(temiz_paragraflar)
 
                       if not full_text:
-                          full_text = "Bu haber özel üyelik gerektiriyor veya sadece bir grafikten ibaret."
+                          full_text = "Bu haber detayına ulaşılamadı. Muhtemelen sadece bir görselden ibaret veya şifreli."
 
                       limit = 3500
                       text_chunks = []
@@ -183,14 +192,14 @@ jobs:
                           time.sleep(2)
 
                   except Exception as e:
-                      pass 
+                      print(f"Haber içeriği çekilirken ufak bir pürüz: {e}")
 
               browser.close()
 
           if new_saved_news and len(new_saved_news) > 5:
               with open(cache_file, "w") as f:
                   json.dump(new_saved_news, f)
-              print("İşlem tamam, yeni liste hafızaya alındı.")
+              print("İşlem tamam, yeni liste başarıyla hafızaya kazındı.")
 
       - name: Güçlendirilmiş Cache Kaydı
         run: |
