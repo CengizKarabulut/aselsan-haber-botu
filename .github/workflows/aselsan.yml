@@ -1,8 +1,8 @@
-name: ASELSAN Haber Takip Botu
+name: ASELSAN Canlı Haber Botu
 on:
   schedule:
     - cron: '*/15 * * * *' # Her 15 dakikada bir otomatik çalışır
-  workflow_dispatch: # İstediğinizde elle de başlatabilmeniz için
+  workflow_dispatch: # İstediğinizde elle tetiklemek için
 
 jobs:
   check-news:
@@ -14,46 +14,90 @@ jobs:
       - name: Python Kur
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Gerekli Kütüphaneleri Yükle
-        run: pip install requests feedparser
+        run: pip install requests cloudscraper beautifulsoup4
 
-      - name: Haberleri Kontrol Et ve Telegram'a At
-        shell: python # 👈 GitHub'a bu bloğun Python olduğunu söyleyen kritik satır!
+      - name: TradingView Kazı ve Telegram'a At
+        shell: python
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          import feedparser
+          import cloudscraper
+          from bs4 import BeautifulSoup
           import requests
           import os
-          from datetime import datetime, timedelta, timezone
-          import time
+          import json
 
-          # Google News - ASELSAN arama sonuçları RSS beslemesi
-          url = "https://news.google.com/rss/search?q=ASELSAN&hl=tr&gl=TR&ceid=TR:tr"
-          feed = feedparser.parse(url)
+          # 1. TradingView Engeli Aşarak Sayfayı Çekme
+          url = "https://tr.tradingview.com/news-flow/?symbol=BIST:ASELS"
+          scraper = cloudscraper.create_scraper()
+          response = scraper.get(url)
+
+          if response.status_code != 200:
+              print(f"Hata: TradingView sayfasına erişilemedi. Kod: {response.status_code}")
+              exit(1)
+
+          # 2. HTML'i Ayrıştırma
+          soup = BeautifulSoup(response.text, 'html.parser')
           
-          now = datetime.now(timezone.utc)
-          # Son 17 dakika içinde yayınlanan haberleri filtrele
-          time_threshold = now - timedelta(minutes=17)
+          # TradingView haber kartlarını bul (Haber başlıkları genellikle 'card-title' içeren sınıflardadır)
+          # Sitenin yapısına göre en garanti seçicileri hedefliyoruz
+          news_items = soup.find_all('div', class_=lambda x: x and 'card' in x and 'title' in x) or soup.find_all('a', class_=lambda x: x and 'title' in x)
+          
+          # Eğer yukarıdaki seçiciler boş dönerse genel link etiketlerini dene
+          if not news_items:
+              news_items = [a for a in soup.find_all('a') if 'news' in a.get('href', '')]
 
           token = os.environ['TELEGRAM_TOKEN']
           chat_id = os.environ['TELEGRAM_CHAT_ID']
+          
+          def telegram_mesaj_gonder(text):
+              tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
+              requests.post(tg_url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
 
-          for entry in feed.entries:
-              pub_date = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+          # 3. Haberleri İşleme Mantığı
+          found_news = []
+          for item in news_items[:3]: # Sadece son 3 haberi al
+              title = item.get_text().strip()
+              link = item.get('href', '')
+              if link and not link.startswith('http'):
+                  link = "https://tr.tradingview.com" + link
+              if title and link:
+                  found_news.append((title, link))
+
+          # Tekrarları engellemek için basit bir hafıza (cache) dosyası kontrolü
+          cache_file = "last_news.json"
+          old_news = []
+          if os.path.exists(cache_file):
+              with open(cache_file, "r") as f:
+                  old_news = json.load(f)
+
+          new_saved_news = [title for title, _ in found_news]
+
+          # Eğer hafıza dosyası yoksa (İlk çalıştırma), son 3 haberi gruba atar
+          if not old_news:
+              if found_news:
+                  telegram_mesaj_gonder("🚀 *ASELSAN Haber Takip Botu Aktif!* Son 3 Haber Getiriliyor:\n" + "—"*15)
+                  for title, link in found_news:
+                      msg = f"🔔 *ASELSAN Haber:*\n\n{title}\n\n[Detayları Gör]({link})"
+                      telegram_mesaj_gonder(msg)
+              else:
+                  telegram_mesaj_gonder("⚠️ TradingView'den şu an haber başlıkları çekilemedi, seçiciler güncellenmeli.")
+          else:
+              # Sonraki çalıştırmalarda yeni haber kontrolü yapar
+              has_new = False
+              for title, link in found_news:
+                  if title not in old_news:
+                      msg = f"🔔 *YENİ ASELSAN HABERİ:*\n\n{title}\n\n[Detayları Gör]({link})"
+                      telegram_mesaj_gonder(msg)
+                      has_new = True
               
-              if pub_date > time_threshold:
-                  title = entry.title
-                  link = entry.link
-                  
-                  # Telegram mesaj formatı
-                  message = f"🔔 *ASELSAN Yeni Haber:*\n\n{title}\n\n[Detayları Oku]({link})"
-                  
-                  tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
-                  payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
-                  
-                  requests.post(tg_url, json=payload)
-                  time.sleep(1) # Botun spam filtresine takılmaması için
+              if not has_new:
+                  telegram_mesaj_gonder("ℹ️ *ASELSAN:* Yeni bir haber bulunmuyor.")
+
+          # Yeni listeyi hafızaya kaydet (GitHub Actions ephemeral olduğu için bu adımı yerel testler için de koruyoruz)
+          with open(cache_file, "w") as f:
+              json.dump(new_saved_news, f)
