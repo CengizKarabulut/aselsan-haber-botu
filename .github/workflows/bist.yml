@@ -66,35 +66,35 @@ jobs:
               page = context.new_page()
 
               try:
-                  # networkidle: Sayfanın arkadaki tüm verileri tamamen yüklemesini bekle
-                  page.goto("https://tr.tradingview.com/news-flow/", timeout=60000, wait_until="networkidle")
-                  page.wait_for_timeout(3000)
+                  # ÇÖZÜM BURADA: Sitenin tamamen susmasını değil, sadece iskeletin yüklenmesini bekle (domcontentloaded)
+                  page.goto("https://tr.tradingview.com/news-flow/", timeout=60000, wait_until="domcontentloaded")
+                  
+                  # Sitenin arka planı hiç susmasa bile, ekranda bize lazım olan ilk "haber" linki belirene kadar bekle
+                  print("Haberlerin ekrana düşmesi bekleniyor...")
+                  page.wait_for_selector('a[href*="/news/"]', timeout=20000)
+                  page.wait_for_timeout(2000)
                   
                   # Ekrandaki gizli haberleri tetiklemek için biraz aşağı kaydır
                   page.evaluate("window.scrollBy(0, 1500)")
                   page.wait_for_timeout(2000)
 
-                  # Playwright'ın güçlü seçicisi ile sadece haber linklerini bul
+                  # Playwright'ın seçicisi ile haber linklerini bul
                   links = page.query_selector_all('a[href*="/news/"]')
                   
                   for a in links:
                       href = a.get_attribute('href')
                       
-                      # Kategori ve menü sayfalarını pas geç
                       if any(k in href for k in ['/markets/', '/crypto/', '/stocks/', '/all/', '/currencies/', '/authors/', '/symbols/']):
                           continue
                           
                       full_link = href if href.startswith('http') else "https://tr.tradingview.com" + href
                       
-                      # ZEKİ BAŞLIK AYIKLAMA (İç içe geçmiş yazılardan sadece haberi çeker)
                       raw_text = a.inner_text().strip()
-                      # Yazıyı satır satır böl, sadece uzun ve anlamlı satırları al
                       lines = [line.strip() for line in raw_text.split('\n') if len(line.strip()) > 10]
                       
                       if not lines:
                           continue
                           
-                      # Kutunun içindeki en uzun metin %99 ihtimalle haberin gerçek başlığıdır
                       title = max(lines, key=len)
                       
                       if len(title) < 15 or any(yasak in title.lower() for yasak in yasakli_basliklar):
@@ -129,6 +129,7 @@ jobs:
               for news in news_to_process:
                   print(f"-> {news['title'][:40]}...")
                   try:
+                      # Aynı şekilde detay sayfalarında da aşırı beklemeyi iptal ettik
                       page.goto(news['link'], timeout=45000, wait_until="domcontentloaded")
                       page.wait_for_timeout(2500)
                       art_soup = BeautifulSoup(page.content(), 'html.parser')
@@ -182,11 +183,10 @@ jobs:
                           time.sleep(2)
 
                   except Exception as e:
-                      pass # Hata olursa bir sonrakine geç
+                      pass 
 
               browser.close()
 
-          # SADECE HABER BULDUYSAK HAFIZAYI KAYDET Kİ BOŞA SIFIRLANMASIN
           if new_saved_news and len(new_saved_news) > 5:
               with open(cache_file, "w") as f:
                   json.dump(new_saved_news, f)
