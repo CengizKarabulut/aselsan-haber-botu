@@ -1,0 +1,58 @@
+name: ASELSAN Haber Takip Botu
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Her 15 dakikada bir otomatik çalışır
+  workflow_dispatch: # İstediğinizde elle de başlatabilmeniz için
+
+jobs:
+  check-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu Çek
+        uses: actions/checkout@v4
+
+      - name: Python Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Gerekli Kütüphaneleri Yükle
+        run: pip install requests feedparser
+
+      - name: Haberleri Kontrol Et ve Telegram'a At
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          import feedparser
+          import requests
+          import os
+          from datetime import datetime, timedelta, timezone
+          import time
+
+          # Google News - ASELSAN arama sonuçları RSS beslemesi
+          url = "https://news.google.com/rss/search?q=ASELSAN&hl=tr&gl=TR&ceid=TR:tr"
+          feed = feedparser.parse(url)
+          
+          now = datetime.now(timezone.utc)
+          # Son 17 dakika içinde yayınlanan haberleri filtrele (Gecikme payı dahil)
+          time_threshold = now - timedelta(minutes=17)
+
+          token = os.environ['TELEGRAM_TOKEN']
+          chat_id = os.environ['TELEGRAM_CHAT_ID']
+
+          for entry in feed.entries:
+              pub_date = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+              
+              if pub_date > time_threshold:
+                  title = entry.title
+                  link = entry.link
+                  
+                  # Telegram mesaj formatı
+                  message = f"🔔 *ASELSAN Yeni Haber:*\n\n{title}\n\n[Detayları Oku]({link})"
+                  
+                  tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
+                  payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
+                  
+                  requests.post(tg_url, json=payload)
+                  time.sleep(1) # Botun spam filtresine takılmaması için
