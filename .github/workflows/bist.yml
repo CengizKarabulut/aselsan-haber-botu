@@ -1,4 +1,4 @@
-name: ASELSAN TradingView Haber Botu
+name: TradingView Kusursuz Haber Botu
 
 on:
   schedule:
