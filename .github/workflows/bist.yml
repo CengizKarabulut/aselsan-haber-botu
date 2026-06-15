@@ -2,7 +2,7 @@ name: TradingView Kusursuz Haber Botu
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '9,24,39,54 * * * *'
   workflow_dispatch:
 
 concurrency:
