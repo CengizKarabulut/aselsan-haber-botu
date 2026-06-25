@@ -6,11 +6,9 @@ on:
       - main
     paths:
       - '.github/workflows/bist.yml'
+      - 'aselsan_news_bot.py'
   schedule:
     - cron: '9,24,39,54 * * * *'
-  repository_dispatch:
-    types:
-      - aselsan-news-tick
   workflow_dispatch:
 
 concurrency:
@@ -40,287 +38,28 @@ jobs:
           playwright install --with-deps chromium
 
       - name: TradingView ASELS haberlerini cek ve gonder
-        shell: python
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
         run: |
-          from playwright.sync_api import sync_playwright
-          from bs4 import BeautifulSoup
-          import html
-          import json
-          import os
-          import re
-          import time
-          from urllib.parse import urlparse, urlunparse
-
-          import requests
-
-          TV_BASE_URL = "https://tr.tradingview.com"
-          TV_NEWS_URL = "https://tr.tradingview.com/news-flow/?symbol=BIST%3AASELS"
-          CACHE_FILE = "tv_news_cache.json"
-          SYMBOL_KEYWORDS = ("ASELS", "ASELSAN", "BIST:ASELS")
-          NEWS_LIMIT = 25
-          TRACK_LIMIT = 40
-          INITIAL_SEND_LIMIT = 5
-          PER_RUN_SEND_LIMIT = 10
-          ARTICLE_TEXT_LIMIT = 3000
-
-          token = os.environ.get("TELEGRAM_TOKEN")
-          chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-
-          if not token or not chat_id:
-              raise SystemExit("TELEGRAM_TOKEN veya TELEGRAM_CHAT_ID eksik.")
-
-          def normalize_space(value):
-              return re.sub(r"\s+", " ", value or "").strip()
-
-          def normalized_link(value):
-              if not value:
-                  return ""
-              parsed = urlparse(value)
-              return urlunparse((parsed.scheme, parsed.netloc, parsed.path.rstrip("/"), "", "", ""))
-
-          def news_key(news):
-              return normalized_link(news.get("link")) or normalize_space(news.get("title")).lower()
-
-          def load_cache(path):
-              if not os.path.exists(path):
-                  return []
-              try:
-                  with open(path, "r", encoding="utf-8") as f:
-                      data = json.load(f)
-              except Exception:
-                  return []
-              if not isinstance(data, list):
-                  return []
-              loaded = []
-              for item in data:
-                  if isinstance(item, str) and item.strip():
-                      loaded.append(item.strip())
-                  elif isinstance(item, dict):
-                      value = item.get("id") or item.get("link") or item.get("title")
-                      if isinstance(value, str) and value.strip():
-                          loaded.append(value.strip())
-              return loaded
-
-          old_news = load_cache(CACHE_FILE)
-          old_news_set = set(old_news)
-          old_title_set = {normalize_space(item).lower() for item in old_news}
-
-          blocked_article_text = [
-              "ICE Data Services", "FactSet", "Telif Hakki", "Telif Hakkı",
-              "CUSIP", "SEC dosyalari", "SEC dosyaları", "TradingView, Inc",
-              "Tum haklari saklidir", "Tüm hakları saklıdır",
-          ]
-
-          def is_known(news):
-              return (
-                  news_key(news) in old_news_set
-                  or normalize_space(news.get("title")).lower() in old_title_set
-              )
-
-          def send_telegram(text):
-              tg_url = f"https://api.telegram.org/bot{token}/sendMessage"
-              response = requests.post(
-                  tg_url,
-                  json={
-                      "chat_id": chat_id,
-                      "text": text,
-                      "parse_mode": "HTML",
-                      "link_preview_options": {"is_disabled": True},
-                  },
-                  timeout=15,
-              )
-              if response.status_code >= 400:
-                  raise RuntimeError(f"Telegram hata verdi: {response.status_code} {response.text[:300]}")
-
-          def trim_article_text(value):
-              value = normalize_space(value).replace(". ", ".\n\n")
-              if len(value) <= ARTICLE_TEXT_LIMIT:
-                  return value
-              return value[:ARTICLE_TEXT_LIMIT].rsplit(" ", 1)[0].strip() + "..."
-
-          def extract_article_text(page):
-              soup = BeautifulSoup(page.content(), "html.parser")
-              paragraphs = soup.select(
-                  "article p, div[class*='body'] p, div[class*='article'] p, "
-                  "div[class*='content'] p"
-              )
-              if not paragraphs:
-                  paragraphs = soup.find_all("p")
-
-              clean = []
-              for p_tag in paragraphs:
-                  text = normalize_space(p_tag.get_text(" ", strip=True))
-                  if len(text) < 40:
-                      continue
-                  if any(blocked in text for blocked in blocked_article_text):
-                      continue
-                  clean.append(text)
-              return trim_article_text("\n\n".join(clean))
-
-          with sync_playwright() as p:
-              print(f"TradingView ASELS haber akisi aciliyor: {TV_NEWS_URL}")
-              browser = p.chromium.launch(headless=True)
-              context = browser.new_context(
-                  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                  viewport={"width": 1920, "height": 1080},
-                  locale="tr-TR",
-                  timezone_id="Europe/Istanbul",
-              )
-              page = context.new_page()
-
-              try:
-                  page.goto(TV_NEWS_URL, timeout=45000, wait_until="domcontentloaded")
-                  page.wait_for_selector('a[href*="/news/"]', timeout=20000)
-                  for _ in range(3):
-                      page.mouse.wheel(0, 900)
-                      page.wait_for_timeout(1200)
-              except Exception as e:
-                  print(f"Sayfa tam yuklenmemis olabilir; eldeki DOM ile devam ediliyor: {e}")
-
-              found_news_links = page.evaluate(
-                  """({baseUrl, forbiddenLinkParts, skipTextParts, symbolKeywords, limit}) => {
-                      const results = [];
-                      const seen = new Set();
-                      const keywords = symbolKeywords.map((k) => k.toUpperCase());
-                      const clean = (value) => (value || "").replace(/\\s+/g, " ").trim();
-                      const hasSymbol = (value) => {
-                          const upper = (value || "").toUpperCase();
-                          return keywords.some((keyword) => upper.includes(keyword));
-                      };
-                      const isBadLine = (line) => {
-                          const lower = line.toLocaleLowerCase("tr-TR");
-                          if (line.length < 12) return true;
-                          if (skipTextParts.some((part) => lower.includes(part))) return true;
-                          if (/^(\\d+\\s*(dk|sa|saat|gun|gün)|\\d{1,2}:\\d{2})/i.test(lower)) return true;
-                          if (["ASELS", "BIST:ASELS", "ASELSAN"].includes(line.toUpperCase())) return true;
-                          return false;
-                      };
-
-                      const anchors = Array.from(document.querySelectorAll('a[href*="/news/"]'));
-                      for (const anchor of anchors) {
-                          const href = anchor.getAttribute("href") || "";
-                          if (!href || forbiddenLinkParts.some((part) => href.includes(part))) continue;
-
-                          const link = href.startsWith("http") ? href : new URL(href, baseUrl).href;
-                          const card = anchor.closest(
-                              'article, [data-testid*="news"], div[class*="story"], div[class*="Story"], div[class*="card"], div[class*="Card"], div[class*="item"], div[class*="Item"]'
-                          ) || anchor.parentElement;
-
-                          const rawTexts = [
-                              anchor.innerText,
-                              anchor.textContent,
-                              card ? card.innerText : "",
-                              card ? card.textContent : "",
-                          ].filter(Boolean);
-
-                          const cardText = rawTexts.map(clean).join(" ");
-                          if (!hasSymbol(cardText) && !hasSymbol(link)) continue;
-
-                          const lines = [];
-                          for (const text of rawTexts) {
-                              for (const line of text.split("\\n").map(clean)) {
-                                  if (!isBadLine(line)) lines.push(line);
-                              }
-                          }
-
-                          const preferred = lines.filter(hasSymbol);
-                          const candidates = preferred.length ? preferred : lines;
-                          if (!candidates.length) continue;
-
-                          let title = candidates.sort((a, b) => b.length - a.length)[0];
-                          if (title.length > 220) title = title.slice(0, 217).trim() + "...";
-
-                          const dedupeKey = link.split(/[?#]/)[0];
-                          if (seen.has(dedupeKey) || seen.has(title)) continue;
-                          seen.add(dedupeKey);
-                          seen.add(title);
-                          results.push({title, link});
-                          if (results.length >= limit) break;
-                      }
-                      return results;
-                  }""",
-                  {
-                      "baseUrl": TV_BASE_URL,
-                      "forbiddenLinkParts": ["/markets/", "/crypto/", "/stocks/", "/all/", "/authors/", "/symbols/", "/ideas/"],
-                      "skipTextParts": ["giris yap", "giriş yap", "premium", "ozel haber", "özel haber"],
-                      "symbolKeywords": list(SYMBOL_KEYWORDS),
-                      "limit": NEWS_LIMIT,
-                  },
-              )
-
-              print(f"ASELS filtresinden gecen TradingView haber sayisi: {len(found_news_links)}")
-              for item in found_news_links[:5]:
-                  print(f"- {item['title']}")
-
-              if not found_news_links:
-                  print("ASELS haberi bulunamadi; cache degistirilmeyecek.")
-                  browser.close()
-                  raise SystemExit(0)
-
-              if not old_news:
-                  news_to_process = found_news_links[:INITIAL_SEND_LIMIT]
-                  print(f"Ilk calistirma: son {len(news_to_process)} haber gonderilecek.")
-              else:
-                  news_to_process = []
-                  for news in reversed(found_news_links):
-                      if not is_known(news):
-                          news_to_process.append(news)
-                  news_to_process = news_to_process[:PER_RUN_SEND_LIMIT]
-                  print(f"Yeni haber sayisi: {len(news_to_process)}")
-
-              for news in news_to_process:
-                  print(f"Gonderiliyor: {news['title'][:80]}")
-                  article_text = ""
-                  try:
-                      page.goto(news["link"], timeout=30000, wait_until="domcontentloaded")
-                      page.wait_for_timeout(2000)
-                      article_text = extract_article_text(page)
-                  except Exception as e:
-                      print(f"Haber detayi okunamadi, baslik ve link gonderilecek: {e}")
-
-                  safe_title = html.escape(news["title"])
-                  safe_link = html.escape(news["link"], quote=True)
-                  if article_text:
-                      message = (
-                          f"<b>{safe_title}</b>\n\n"
-                          f"{html.escape(article_text)}\n\n"
-                          f"<a href=\"{safe_link}\">TradingView'de oku</a>"
-                      )
-                  else:
-                      message = f"<b>{safe_title}</b>\n\n<a href=\"{safe_link}\">TradingView'de oku</a>"
-
-                  send_telegram(message)
-                  time.sleep(2)
-
-              browser.close()
-
-          new_cache = [news_key(news) for news in found_news_links[:TRACK_LIMIT]]
-          with open(CACHE_FILE, "w", encoding="utf-8") as f:
-              json.dump(new_cache, f, ensure_ascii=False, indent=2)
-          print("TradingView ASELS cache guncellendi.")
+          python aselsan_news_bot.py
 
       - name: Cache kaydet
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
+          git pull --rebase --autostash || true
           git add tv_news_cache.json
-          git commit -m "TV onbellek guncellendi [skip ci]" || echo "Degisiklik yok"
-          git pull --rebase || echo "Cekilecek yeni bir sey yok"
-          git push || echo "Push hatasi, sonraki turda tekrar denenecek"
-
-      - name: Sonraki calismayi tetikle
-        if: ${{ always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch') }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "15 dakika sonra bir sonraki calisma tetiklenecek."
-          sleep 900
-          curl -fsSL -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            --data '{"event_type":"aselsan-news-tick"}'
+          if git diff --cached --quiet; then
+            echo "Degisiklik yok"
+            exit 0
+          fi
+          git commit -m "TV onbellek guncellendi [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            echo "Push denemesi ${attempt} basarisiz; tekrar denenecek."
+            sleep 5
+          done
+          echo "Cache GitHub'a yazilamadi."
+          exit 1
