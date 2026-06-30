@@ -1,9 +1,10 @@
 {
   "source_version": "aselsan-tradingview-v2",
-  "last_seen_key": "https://tr.tradingview.com/news/matriks:6553089:0",
+  "last_seen_key": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4320A7:0",
   "seen_keys": [
-    "https://tr.tradingview.com/news/matriks:6553089:0",
+    "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4320A7:0",
     "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N42N09Q:0",
+    "https://tr.tradingview.com/news/matriks:6553089:0",
     "https://tr.tradingview.com/news/matriks:6545160:0"
   ]
 }
