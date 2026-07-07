@@ -331,6 +331,37 @@ def telegram_retry_after(response):
         return 15
 
 
+def inspect_telegram_delivery():
+    if DRY_RUN:
+        return
+
+    api_base = f"https://api.telegram.org/bot{token}"
+    try:
+        identity_response = requests.get(f"{api_base}/getMe", timeout=20)
+        identity_response.raise_for_status()
+        identity = identity_response.json().get("result", {})
+        username = normalize_space(identity.get("username"))
+        if username:
+            print(f"Telegram botu dogrulandi: @{username}")
+
+        webhook_response = requests.get(f"{api_base}/getWebhookInfo", timeout=20)
+        webhook_response.raise_for_status()
+        webhook = webhook_response.json().get("result", {})
+        webhook_url = normalize_space(webhook.get("url"))
+        pending_count = webhook.get("pending_update_count", 0)
+        if webhook_url:
+            webhook_host = urlparse(webhook_url).netloc or "bilinmeyen sunucu"
+            print(
+                "UYARI: Bu gonderim botuna baska bir webhook bagli: "
+                f"{webhook_host} (bekleyen guncelleme: {pending_count})."
+            )
+        else:
+            print("Telegram webhook etkin degil; gonderim modu dogru.")
+    except Exception as exc:
+        # Haber gonderimini gecici bir Telegram tanilama hatasi yuzunden durdurma.
+        print(f"Telegram webhook kontrolu tamamlanamadi; gonderime devam ediliyor: {exc}")
+
+
 def send_telegram(text):
     if DRY_RUN:
         print(f"DRY_RUN: Telegram'a gonderilmeyecek ({len(text)} karakter).")
@@ -442,6 +473,7 @@ def build_message(news, article_text):
 
 
 def main():
+    inspect_telegram_delivery()
     cache_state = load_state(CACHE_FILE)
 
     try:
