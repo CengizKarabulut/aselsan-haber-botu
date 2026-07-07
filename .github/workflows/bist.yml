@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - agent/diagnose-asels-telegram-conflict
     paths:
       - '.github/workflows/bist.yml'
       - 'aselsan_news_bot.py'
