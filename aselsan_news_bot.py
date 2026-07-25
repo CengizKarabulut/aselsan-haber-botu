@@ -90,14 +90,17 @@ def dedupe_news(news_items):
 
 
 def load_state(path):
-    state = {"source_version": "", "last_seen_key": "", "seen_keys": []}
+    state = {"source_version": "", "last_seen_key": "", "seen_keys": [], "cache_status": "missing"}
     if not os.path.exists(path):
         return state
+
+    state["cache_status"] = "ok"
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except Exception as exc:
-        print(f"Cache okunamadi, guvenli baslangic yapilacak: {exc}")
+        print(f"Cache okunamadi; tekrar gonderimi engellemek icin sadece yeni referans alinacak: {exc}")
+        state["cache_status"] = "invalid"
         return state
 
     if isinstance(data, dict):
@@ -131,7 +134,10 @@ def load_state(path):
         state["seen_keys"] = loaded
         if loaded:
             state["last_seen_key"] = loaded[0]
+        return state
 
+    print("Cache formati taninmadi; tekrar gonderimi engellemek icin sadece yeni referans alinacak.")
+    state["cache_status"] = "invalid"
     return state
 
 
@@ -396,7 +402,8 @@ def select_news_to_process(found_news, state):
     old_news_set = set(old_news)
     last_seen_key = state["last_seen_key"]
 
-    is_empty_state = not state["source_version"] and not last_seen_key and not old_news
+    is_missing_cache = state.get("cache_status") == "missing"
+    is_empty_state = is_missing_cache and not state["source_version"] and not last_seen_key and not old_news
     if is_empty_state:
         bootstrap_count = max(0, min(BOOTSTRAP_SEND_LIMIT, len(found_news)))
         candidates = list(reversed(found_news[:bootstrap_count]))
