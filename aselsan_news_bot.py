@@ -13,11 +13,12 @@ from playwright.sync_api import sync_playwright
 TV_BASE_URL = "https://tr.tradingview.com"
 TV_NEWS_URL = "https://tr.tradingview.com/news-flow/?symbol=BIST%3AASELS"
 NEWS_API_URL = "https://news-mediator.tradingview.com/public/news-flow/v2/news"
-NEWS_API_PARAMS = {
-    "filter": "lang:tr",
-    "client": "screener",
-    "user_prostatus": "free",
-}
+NEWS_API_PARAMS = [
+    ("filter", "lang:tr"),
+    ("filter", "symbol:BIST:ASELS"),
+    ("client", "screener"),
+    ("user_prostatus", "free"),
+]
 SOURCE_VERSION = "aselsan-tradingview-v2"
 SYMBOL = "BIST:ASELS"
 SYMBOL_KEYWORDS = ("ASELS", "ASELSAN", "BIST:ASELS")
@@ -29,6 +30,7 @@ PER_RUN_SEND_LIMIT = int(os.environ.get("PER_RUN_SEND_LIMIT", "20"))
 TELEGRAM_SEND_DELAY = float(os.environ.get("TELEGRAM_SEND_DELAY", "4"))
 MAX_TELEGRAM_ATTEMPTS = int(os.environ.get("MAX_TELEGRAM_ATTEMPTS", "5"))
 ARTICLE_TEXT_LIMIT = int(os.environ.get("ARTICLE_TEXT_LIMIT", "2800"))
+BOOTSTRAP_SEND_LIMIT = int(os.environ.get("BOOTSTRAP_SEND_LIMIT", "1"))
 DRY_RUN = os.environ.get("DRY_RUN", "").lower() in {"1", "true", "yes"}
 
 token = os.environ.get("TELEGRAM_TOKEN")
@@ -311,7 +313,17 @@ def fetch_dom_news(page):
         {
             "baseUrl": TV_BASE_URL,
             "forbiddenLinkParts": ["/markets/", "/crypto/", "/stocks/", "/all/", "/authors/", "/symbols/", "/ideas/"],
-            "skipTextParts": ["giris yap", "giriş yap", "premium", "ozel haber", "özel haber"],
+            "skipTextParts": [
+                "giris yap",
+                "giriş yap",
+                "premium",
+                "ozel haber",
+                "özel haber",
+                "ucretsiz deneme",
+                "ücretsiz deneme",
+                "bu haberi okumak icin",
+                "bu haberi okumak için",
+            ],
             "symbolKeywords": list(SYMBOL_KEYWORDS),
             "limit": NEWS_LIMIT,
         },
@@ -383,6 +395,14 @@ def select_news_to_process(found_news, state):
     old_news = state["seen_keys"]
     old_news_set = set(old_news)
     last_seen_key = state["last_seen_key"]
+
+    is_empty_state = not state["source_version"] and not last_seen_key and not old_news
+    if is_empty_state:
+        bootstrap_count = max(0, min(BOOTSTRAP_SEND_LIMIT, len(found_news)))
+        candidates = list(reversed(found_news[:bootstrap_count]))
+        if candidates:
+            print(f"Cache bos; en yeni {len(candidates)} haber guvenli baslangic olarak gonderilecek.")
+            return candidates, len(candidates), latest_key, current_keys, old_news, "normal"
 
     if state["source_version"] != SOURCE_VERSION:
         print("Cache veri kaynagi eski veya farkli; eski haberleri gondermemek icin sadece yeni referans alinacak.")
@@ -459,7 +479,7 @@ def main():
             timezone_id="Europe/Istanbul",
         )
         page = context.new_page()
-        dom_news = fetch_dom_news(page)
+        dom_news = [] if api_news else fetch_dom_news(page)
         found_news_links = dedupe_news(api_news + dom_news)[:NEWS_LIMIT]
 
         print(f"ASELS filtresinden gecen TradingView haber sayisi: {len(found_news_links)}")
