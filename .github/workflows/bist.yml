@@ -71,7 +71,7 @@ jobs:
 
   schedule-next:
     needs: check-tv-news
-    if: ${{ always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch') }}
     runs-on: ubuntu-latest
     concurrency:
       group: aselsan-tradingview-news-ticker
