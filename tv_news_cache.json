@@ -1,7 +1,13 @@
 {
   "source_version": "aselsan-tradingview-v2",
+<<<<<<< Updated upstream
   "last_seen_key": "https://tr.tradingview.com/news/matriks:6645573:0",
   "seen_keys": [
+=======
+  "last_seen_key": "https://tr.tradingview.com/news/matriks:6645582:0",
+  "seen_keys": [
+    "https://tr.tradingview.com/news/matriks:6645582:0",
+>>>>>>> Stashed changes
     "https://tr.tradingview.com/news/matriks:6645573:0",
     "https://tr.tradingview.com/news/matriks:6645476:0",
     "https://tr.tradingview.com/news/matriks:6645468:0",
