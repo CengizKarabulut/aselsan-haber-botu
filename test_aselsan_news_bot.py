@@ -105,6 +105,12 @@ class AselsanNewsBotTests(unittest.TestCase):
         self.assertEqual(state["sources"]["tradingview"]["last_seen_key"], "tradingview:https://tv/new")
         self.assertEqual(len(state["sources"]["tradingview"]["seen_keys"]), 2)
 
+    def test_activation_message_explains_sources(self):
+        message = bot.build_activation_message()
+        self.assertIn("ASELSAN çok kaynaklı haber botu aktif", message)
+        self.assertIn("KAP → Bloomberg HT", message)
+        self.assertLessEqual(len(message), 3900)
+
     def test_message_is_escaped_and_limited(self):
         item = bot.blank_item(
             "kap", "ASELS <kritik>", "https://kap/1?a=1&b=2",

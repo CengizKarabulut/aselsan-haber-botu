@@ -477,6 +477,14 @@ def build_message(item):
     return "\n\n".join(parts[:2] + [body[:3900 - len(fixed) - 6].rstrip() + "…", parts[-1]])
 
 
+def build_activation_message():
+    return (
+        "<b>✅ ASELSAN çok kaynaklı haber botu aktif</b>\n\n"
+        "Kaynak önceliği: KAP → Bloomberg HT → Investing → NTV Para → TRT Haber → TradingView\n\n"
+        "Yeni ASELSAN haberleri ve önemli KAP bildirimleri tekrar edilmeden bu kanala gönderilecek."
+    )
+
+
 def send_message(text):
     if DRY_RUN:
         print(f"DRY_RUN ({len(text)} karakter):\n{text}\n")
@@ -510,6 +518,13 @@ def send_message(text):
 
 def main():
     state, remaining = load_state(), PER_RUN_SEND_LIMIT
+    if state.get("activation_notice_version") != SOURCE_VERSION:
+        if send_message(build_activation_message()):
+            state["activation_notice_version"] = SOURCE_VERSION
+            save_state(state)
+            print("Telegram aktivasyon bildirimi gönderildi")
+        else:
+            print("Telegram aktivasyon bildirimi gönderilemedi; sonraki çalışmada yeniden denenecek")
     fingerprints = state.setdefault("fingerprints", [])
     for source in ENABLED_SOURCES:
         try:
