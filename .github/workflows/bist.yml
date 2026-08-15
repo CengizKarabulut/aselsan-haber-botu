@@ -1,55 +1,49 @@
-name: TradingView Kusursuz Haber Botu
+name: ASELSAN Cok Kaynakli Haber Botu
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - '.github/workflows/bist.yml'
       - 'aselsan_news_bot.py'
+      - 'requirements.txt'
+      - 'test_aselsan_news_bot.py'
   schedule:
     - cron: '9 * * * *'
     - cron: '24 * * * *'
     - cron: '39 * * * *'
     - cron: '54 * * * *'
   repository_dispatch:
-    types:
-      - aselsan-news-tick
+    types: [aselsan-news-tick]
   workflow_dispatch:
 
 jobs:
-  check-tv-news:
+  check-news:
     runs-on: ubuntu-latest
     concurrency:
-      group: aselsan-tradingview-news-check
+      group: aselsan-multi-source-news-check
       cancel-in-progress: false
     permissions:
       contents: write
-
     steps:
       - name: Kodu cek
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
       - name: Python kur
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.10'
-
-      - name: Tarayici ve kutuphaneleri yukle
-        run: |
-          pip install requests beautifulsoup4 playwright
-          playwright install --with-deps chromium
-
-      - name: TradingView ASELS haberlerini cek ve gonder
+      - name: Kutuphaneleri yukle
+        run: pip install -r requirements.txt
+      - name: Testleri calistir
+        run: python -m unittest -v test_aselsan_news_bot.py
+      - name: ASELSAN haberlerini cek ve Telegram'a gonder
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
-        run: |
-          python aselsan_news_bot.py
-
+        run: python aselsan_news_bot.py
       - name: Cache kaydet
         run: |
           git config --global user.email "action@github.com"
@@ -60,31 +54,28 @@ jobs:
             echo "Degisiklik yok"
             exit 0
           fi
-          git commit -m "TV onbellek guncellendi [skip ci]"
+          git commit -m "ASELSAN haber cache guncellendi [skip ci]"
           for attempt in 1 2 3; do
             git pull --rebase --autostash && git push && exit 0
             echo "Push denemesi ${attempt} basarisiz; tekrar denenecek."
             sleep 5
           done
-          echo "Cache GitHub'a yazilamadi."
           exit 1
 
   schedule-next:
-    needs: check-tv-news
+    needs: check-news
     if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch') }}
     runs-on: ubuntu-latest
     concurrency:
-      group: aselsan-tradingview-news-ticker
+      group: aselsan-multi-source-news-ticker
       cancel-in-progress: true
     permissions:
       contents: write
-
     steps:
       - name: Sonraki calismayi tetikle
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "15 dakika sonra bir sonraki calisma tetiklenecek."
           sleep 900
           curl -fsSL -X POST \
             -H "Accept: application/vnd.github+json" \
