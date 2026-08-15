@@ -22,6 +22,7 @@ bulunan içerikler kabul edilir. Genel savunma sanayii haberleri ASELSAN adı ge
 - Aynı olay daha düşük öncelikli başka bir kaynakta yayımlanırsa tekrar gönderilmez.
 - Mesajlarda kaynak, tarih, özet, sınırlı ayrıntı ve resmî bağlantı bulunur.
 - İlk çalışmada eski içerikler gönderilmez; mevcut TradingView cache'i yeni yapıya taşınır.
+- Yeni bot sürümü devreye girdiğinde Telegram'a yalnızca bir kez aktivasyon bildirimi gönderilir.
 
 ## GitHub Secrets
 
