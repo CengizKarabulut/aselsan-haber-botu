@@ -2,9 +2,11 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6693035:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6693184:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6693184:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6693035:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6693025:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6664247:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6648700:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4430EN:0",
@@ -141,6 +143,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "gunluk hisse senedi piyasas gorunumu akbank ekonomik arast rmalar ak yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6693184:0"
+    },
     {
       "source": "tradingview",
       "text": "gedik yat r m asels hedef fiyat 587 tl tavsiye endeks ustu getiri",
