@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6693184:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6703121:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6703121:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6693184:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6693035:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6693025:0",
@@ -143,6 +144,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bist100 2c26 genel degerlendirme garanti bbva yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6703121:0"
+    },
     {
       "source": "tradingview",
       "text": "gunluk hisse senedi piyasas gorunumu akbank ekonomik arast rmalar ak yat r m",
