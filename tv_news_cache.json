@@ -147,6 +147,12 @@
       "seen_keys": [
         "bloomberght:https://www.bloomberght.com/defence-news-top-100-de-aselsan-uc-sira-yukseldi-3786972"
       ]
+    },
+    "trthaber": {
+      "last_seen_key": "trthaber:https://www.trthaber.com/haber/ekonomi/aselsan-konya-ve-iskurdan-is-birligi-955842.html",
+      "seen_keys": [
+        "trthaber:https://www.trthaber.com/haber/ekonomi/aselsan-konya-ve-iskurdan-is-birligi-955842.html"
+      ]
     }
   },
   "fingerprints": [
