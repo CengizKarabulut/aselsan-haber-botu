@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6723144:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6725672:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6725672:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6723144:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6718769:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6703121:0",
@@ -158,6 +159,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "turkiye ar ge 500 arast rmas ac kland",
+      "link": "https://tr.tradingview.com/news/matriks:6725672:0"
+    },
     {
       "source": "tradingview",
       "text": "gunluk hisse senedi piyasas gorunumu akbank ekonomik arast rmalar ak yat r m",
