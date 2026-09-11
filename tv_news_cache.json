@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6733036:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6735869:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6735869:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6733036:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6729624:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6728742:0",
@@ -163,6 +164,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "ankara fabrika ziyaretleri aselsan turk traktor astor enerji global menkul degerler",
+      "link": "https://tr.tradingview.com/news/matriks:6735869:0"
+    },
     {
       "source": "tradingview",
       "text": "qnb invest yeni yat r m fonu duzenlemesinden muaf bist 30 hisselerinin olas portfoy yeniden dengelemesi fon girislerinden fayda gormesini bekliyor",
