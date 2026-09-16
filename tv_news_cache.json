@@ -2,8 +2,10 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6735869:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6744857:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6744857:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6744852:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6735869:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6733036:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6729624:0",
@@ -164,6 +166,16 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "info yat r m asels hedef fiyat 510 tl tavsiye endeks ustu getiri",
+      "link": "https://tr.tradingview.com/news/matriks:6744857:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "sirket raporu asels info yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6744852:0"
+    },
     {
       "source": "tradingview",
       "text": "ankara fabrika ziyaretleri aselsan turk traktor astor enerji global menkul degerler",
