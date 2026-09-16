@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6744857:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6744981:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6744981:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6744857:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6744852:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6735869:0",
@@ -166,6 +167,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "kaynaktan duzeltme sirket raporu asels info yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6744981:0"
+    },
     {
       "source": "tradingview",
       "text": "info yat r m asels hedef fiyat 510 tl tavsiye endeks ustu getiri",
