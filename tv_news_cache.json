@@ -2,8 +2,11 @@
   "source_version": "aselsan-multi-source-v1",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6744981:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6752706:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6752703:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6744981:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6744857:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6744852:0",
@@ -122,9 +125,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1643570",
+      "last_seen_key": "kap:1665180",
       "seen_keys": [
-        "kap:1643570",
+        "kap:1665180",
         "kap:1643144",
         "kap:1643143",
         "kap:1643142",
@@ -150,7 +153,8 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
-        "kap:1506510"
+        "kap:1506510",
+        "kap:1643570"
       ]
     },
     "bloomberght": {
@@ -167,6 +171,26 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan 56 milyon dolar tutarl gudum sistemleri uretim merkezi ni devreye ald kap",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "aselsan yeni yat r m m z birlikte gudum sistemlerinin uretiminde robotik otomasyon altyap s guclendirildi teslimat kapasitesi h z kalite kabiliyeti art r ld",
+      "link": "https://tr.tradingview.com/news/matriks:6752706:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "aselsan toplam tutar 56 milyon abd dolar olan 17 865m2 kapal alana sahip gudum sistemleri uretim merkezi devreye al nm st r",
+      "link": "https://tr.tradingview.com/news/matriks:6752703:0"
+    },
+    {
+      "source": "kap",
+      "text": "asels ozel durum ac klamas genel devreye al nan yat r m m z hakk nda",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1665180"
+    },
     {
       "source": "tradingview",
       "text": "kaynaktan duzeltme sirket raporu asels info yat r m",
