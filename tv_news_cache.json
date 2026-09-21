@@ -125,8 +125,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1665180",
+      "last_seen_key": "kap:1666209",
       "seen_keys": [
+        "kap:1666209",
         "kap:1665180",
         "kap:1643144",
         "kap:1643143",
@@ -171,6 +172,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels temerrut islemi isleme ac lan temerrut s ras",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1666209"
+    },
     {
       "source": "tradingview",
       "text": "aselsan 56 milyon dolar tutarl gudum sistemleri uretim merkezi ni devreye ald kap",
