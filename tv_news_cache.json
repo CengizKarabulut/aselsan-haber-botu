@@ -125,8 +125,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1666209",
+      "last_seen_key": "kap:1666319",
       "seen_keys": [
+        "kap:1666319",
         "kap:1666209",
         "kap:1665180",
         "kap:1643144",
@@ -172,6 +173,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels spk islem yasag nedeniyle pay duyurusu spk islem yasag nedeniyle pay duyurusu",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1666319"
+    },
     {
       "source": "kap",
       "text": "asels temerrut islemi isleme ac lan temerrut s ras",
