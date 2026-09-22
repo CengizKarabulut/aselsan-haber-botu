@@ -6,8 +6,10 @@ on:
     paths:
       - '.github/workflows/bist.yml'
       - 'aselsan_news_bot.py'
+      - 'aselsan_news_bot_v2.py'
       - 'requirements.txt'
       - 'test_aselsan_news_bot.py'
+      - 'test_aselsan_formatting.py'
   schedule:
     - cron: '9 * * * *'
     - cron: '24 * * * *'
@@ -37,13 +39,15 @@ jobs:
       - name: Kutuphaneleri yukle
         run: pip install -r requirements.txt
       - name: Testleri calistir
-        run: python -m unittest -v test_aselsan_news_bot.py
+        run: |
+          python -m unittest -v test_aselsan_news_bot.py test_aselsan_formatting.py
+          python -m py_compile aselsan_news_bot.py aselsan_news_bot_v2.py
       - name: ASELSAN haberlerini cek ve Telegram'a gonder
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
-        run: python aselsan_news_bot.py
+        run: python aselsan_news_bot_v2.py
       - name: Cache kaydet
         run: |
           git config --global user.email "action@github.com"
