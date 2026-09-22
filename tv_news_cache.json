@@ -125,9 +125,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1666462",
+      "last_seen_key": "kap:1666607",
       "seen_keys": [
-        "kap:1666462",
+        "kap:1666607",
         "kap:1666319",
         "kap:1665180",
         "kap:1643144",
@@ -155,6 +155,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1666462",
         "kap:1666209",
         "kap:1506510",
         "kap:1643570"
@@ -174,6 +175,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels temerrut islemi isleme ac lan temerrut s ras",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1666607"
+    },
     {
       "source": "kap",
       "text": "asels temerrut islemi isleme ac lan temerrut s ras",
