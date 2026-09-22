@@ -1,5 +1,5 @@
 {
-  "source_version": "aselsan-multi-source-v1",
+  "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
       "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
@@ -286,5 +286,5 @@
       "link": "https://tr.tradingview.com/news/matriks:6693035:0"
     }
   ],
-  "activation_notice_version": "aselsan-multi-source-v1"
+  "activation_notice_version": "aselsan-multi-source-v2"
 }
