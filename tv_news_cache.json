@@ -127,9 +127,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1666979",
+      "last_seen_key": "kap:1667027",
       "seen_keys": [
-        "kap:1666979",
+        "kap:1667027",
         "kap:1666885",
         "kap:1666319",
         "kap:1665180",
@@ -157,6 +157,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1666979",
         "kap:1666607",
         "kap:1631439",
         "kap:1666462",
@@ -179,6 +180,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels temerrut islemi temerrut isleminin tamamlanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1667027"
+    },
     {
       "source": "kap",
       "text": "asels temerrut islemi isleme ac lan temerrut s ras",
