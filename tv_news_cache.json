@@ -2,8 +2,10 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45F09R:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45F09R:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6762601:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6752706:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6752703:0",
@@ -125,8 +127,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1666607",
+      "last_seen_key": "kap:1666885",
       "seen_keys": [
+        "kap:1666885",
         "kap:1666607",
         "kap:1666319",
         "kap:1665180",
@@ -136,7 +139,6 @@
         "kap:1643141",
         "kap:1643140",
         "kap:1635301",
-        "kap:1631439",
         "kap:1610499",
         "kap:1610498",
         "kap:1610497",
@@ -155,6 +157,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1631439",
         "kap:1666462",
         "kap:1666209",
         "kap:1506510",
@@ -162,9 +165,9 @@
       ]
     },
     "bloomberght": {
-      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-polonya-da-yeni-ihracat-sozlesmesi-3787623",
+      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-ile-roketsan-arasinda-sozlesme-3789114",
       "seen_keys": [
-        "bloomberght:https://www.bloomberght.com/aselsan-dan-polonya-da-yeni-ihracat-sozlesmesi-3787623"
+        "bloomberght:https://www.bloomberght.com/aselsan-ile-roketsan-arasinda-sozlesme-3789114"
       ]
     },
     "trthaber": {
@@ -175,6 +178,21 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan roketsan toplam tutar 1 23 mlyr euro olan sozlesme imzalad kap",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45F09R:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "aselsan roketsan aras nda hava savunma sistemlerine yonelik alt bilesenlerin tedariki kapsam nda toplam tutar 1 234 210 000 euro olan sozlesme imzaland",
+      "link": "https://tr.tradingview.com/news/matriks:6762601:0"
+    },
+    {
+      "source": "kap",
+      "text": "asels yeni is iliskisi sozlesme imzalanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1666885"
+    },
     {
       "source": "kap",
       "text": "asels temerrut islemi isleme ac lan temerrut s ras",
