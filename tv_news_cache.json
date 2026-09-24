@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45F09R:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45G09T:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45G09T:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45F09R:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6762601:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45A0J1:0",
@@ -180,6 +181,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bas nda bugun 24 eylul persembe",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45G09T:0"
+    },
     {
       "source": "kap",
       "text": "asels temerrut islemi temerrut isleminin tamamlanmas",
