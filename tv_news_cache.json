@@ -129,8 +129,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1667027",
+      "last_seen_key": "kap:1668183",
       "seen_keys": [
+        "kap:1668183",
         "kap:1667027",
         "kap:1666885",
         "kap:1666319",
@@ -155,10 +156,10 @@
         "kap:1545365",
         "kap:1531899",
         "kap:1528057",
-        "kap:1525506",
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1525506",
         "kap:1666979",
         "kap:1666607",
         "kap:1631439",
@@ -182,6 +183,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels kurumsal yonetim ilkelerine uyum derecelendirmesi kurumsal yonetim ilkelerine uyum derecelendirmesi sozlesmesinin yenilenmesi",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1668183"
+    },
     {
       "source": "tradingview",
       "text": "bas nda bugun 24 eylul persembe",
