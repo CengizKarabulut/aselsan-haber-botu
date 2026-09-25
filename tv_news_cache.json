@@ -129,8 +129,10 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1668183",
+      "last_seen_key": "kap:1668298",
       "seen_keys": [
+        "kap:1668298",
+        "kap:1668268",
         "kap:1668183",
         "kap:1667027",
         "kap:1666885",
@@ -147,7 +149,6 @@
         "kap:1610497",
         "kap:1607071",
         "kap:1607068",
-        "kap:1596123",
         "kap:1576402",
         "kap:1561060",
         "kap:1561059",
@@ -159,6 +160,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1596123",
         "kap:1525506",
         "kap:1666979",
         "kap:1666607",
@@ -183,6 +185,16 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels tsrs uyumlu surdurulebilirlik raporu 2025 tsrs uyumlu surdurulebilirlik raporu nun kamuya ac klanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1668298"
+    },
+    {
+      "source": "kap",
+      "text": "asels surdurulebilirlik raporu aselsan elektronik sanayi ticaret a s 2025 y l surdurulebilirlik raporu",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1668268"
+    },
     {
       "source": "kap",
       "text": "asels kurumsal yonetim ilkelerine uyum derecelendirmesi kurumsal yonetim ilkelerine uyum derecelendirmesi sozlesmesinin yenilenmesi",
