@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6772995:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6775119:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6775119:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6772995:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6772981:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45G0BM:0",
@@ -187,6 +188,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "selcuk gonencler teknik rota aksam matriks youtube kanal nda",
+      "link": "https://tr.tradingview.com/news/matriks:6775119:0"
+    },
     {
       "source": "tradingview",
       "text": "agustos ay nda yurt ici sat s teslim belgesi alan bist firmalar",
