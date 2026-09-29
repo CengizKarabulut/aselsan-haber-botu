@@ -185,6 +185,12 @@
       "seen_keys": [
         "trthaber:https://www.trthaber.com/haber/ekonomi/aselsan-konya-ve-iskurdan-is-birligi-955842.html"
       ]
+    },
+    "ntvpara": {
+      "last_seen_key": "ntvpara:https://www.ntv.com.tr/ntvpara/galeri-turkiyenin-yeni-yerli-telefonu-geliyor-uretim-yeri-malatya-cikis-tarihi-belli-oldu-1743988",
+      "seen_keys": [
+        "ntvpara:https://www.ntv.com.tr/ntvpara/galeri-turkiyenin-yeni-yerli-telefonu-geliyor-uretim-yeri-malatya-cikis-tarihi-belli-oldu-1743988"
+      ]
     }
   },
   "fingerprints": [
