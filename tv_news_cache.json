@@ -2,8 +2,10 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45N09X:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6783151:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6783151:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6783143:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45N09X:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6782360:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6775119:0",
@@ -198,6 +200,16 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bofa aselsan al tavsiyesiyle takibe ald",
+      "link": "https://tr.tradingview.com/news/matriks:6783151:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "bofa merrill lynch asels hedef fiyat 575 tl tavsiye al",
+      "link": "https://tr.tradingview.com/news/matriks:6783143:0"
+    },
     {
       "source": "tradingview",
       "text": "aselsan savunma sanayii baskanl g uzun menzilli hava savunma sistemlerinin projeleri kapsam nda 1 01 mlyr sozlesmeler imzalad kap",
