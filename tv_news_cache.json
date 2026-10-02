@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6783151:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6785556:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6785556:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6783151:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6783143:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45N09X:0",
@@ -201,6 +202,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "gunluk bulten anadolu yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6785556:0"
+    },
     {
       "source": "kap",
       "text": "asels spk islem yasag nedeniyle pay duyurusu spk islem yasag nedeniyle pay duyurusu",
