@@ -2,8 +2,10 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6785556:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45O07W:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45O07W:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6785584:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6785556:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6783151:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6783143:0",
@@ -137,14 +139,14 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1671000",
+      "last_seen_key": "kap:1671181",
       "seen_keys": [
+        "kap:1671181",
+        "kap:1671098",
         "kap:1671000",
-        "kap:1670614",
         "kap:1668298",
         "kap:1668268",
         "kap:1668183",
-        "kap:1667027",
         "kap:1665180",
         "kap:1643144",
         "kap:1643143",
@@ -168,6 +170,8 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1670614",
+        "kap:1667027",
         "kap:1666319",
         "kap:1666885",
         "kap:1596123",
@@ -182,9 +186,9 @@
       ]
     },
     "bloomberght": {
-      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-yeni-is-sozlesmesi-3789932",
+      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-488-5-milyon-euroluk-sozlesme-3790074",
       "seen_keys": [
-        "bloomberght:https://www.bloomberght.com/aselsan-dan-yeni-is-sozlesmesi-3789932"
+        "bloomberght:https://www.bloomberght.com/aselsan-dan-488-5-milyon-euroluk-sozlesme-3790074"
       ]
     },
     "trthaber": {
@@ -194,14 +198,40 @@
       ]
     },
     "ntvpara": {
-      "last_seen_key": "ntvpara:https://www.ntv.com.tr/ntvpara/aselsana-1-milyar-euroluk-siparis-1744281",
+      "last_seen_key": "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-488-milyon-euroluk-anlasma-1744433",
       "seen_keys": [
+        "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-488-milyon-euroluk-anlasma-1744433",
         "ntvpara:https://www.ntv.com.tr/ntvpara/aselsana-1-milyar-euroluk-siparis-1744281",
         "ntvpara:https://www.ntv.com.tr/ntvpara/galeri-turkiyenin-yeni-yerli-telefonu-geliyor-uretim-yeri-malatya-cikis-tarihi-belli-oldu-1743988"
       ]
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan yurt d s ndaki kullan c hava savunma sistemlerinin ihracat na iliskin 488 5 milyonluk sozlesme imzalad kap",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45O07W:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "aselsan yurt d s ndaki kullan c hava savunma sistemlerinin ihracat na iliskin toplam tutar 488 5 milyon avro olan sat s sozlesmesi imzalad",
+      "link": "https://tr.tradingview.com/news/matriks:6785584:0"
+    },
+    {
+      "source": "ntvpara",
+      "text": "aselsan dan 9 gunde 2 7 milyar euro luk sat s sozlesmesi aselsan yurt d s ndaki kullan c dan 488 5 milyon euro tutar nda is sozlesmesi imzalad",
+      "link": "https://www.ntv.com.tr/ntvpara/aselsandan-488-milyon-euroluk-anlasma-1744433"
+    },
+    {
+      "source": "kap",
+      "text": "asels temerrut islemi isleme ac lan temerrut s ras",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1671181"
+    },
+    {
+      "source": "kap",
+      "text": "asels yeni is iliskisi sozlesme imzalanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1671098"
+    },
     {
       "source": "tradingview",
       "text": "gunluk bulten anadolu yat r m",
