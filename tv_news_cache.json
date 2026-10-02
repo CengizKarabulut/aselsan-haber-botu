@@ -139,9 +139,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1671181",
+      "last_seen_key": "kap:1671270",
       "seen_keys": [
-        "kap:1671181",
+        "kap:1671270",
         "kap:1671098",
         "kap:1671000",
         "kap:1668298",
@@ -170,6 +170,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1671181",
         "kap:1670614",
         "kap:1667027",
         "kap:1666319",
@@ -207,6 +208,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels temerrut islemi temerrut isleminin tamamlanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1671270"
+    },
     {
       "source": "tradingview",
       "text": "aselsan yurt d s ndaki kullan c hava savunma sistemlerinin ihracat na iliskin 488 5 milyonluk sozlesme imzalad kap",
