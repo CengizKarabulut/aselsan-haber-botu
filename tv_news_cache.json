@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45S09O:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6795500:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6795500:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45S09O:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45S09U:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6793689:0",
@@ -214,6 +215,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan gm akyol alcak dunya yorungesi tak m uydu projesi olan astralink hamlesini baslatt klar n belirtti",
+      "link": "https://tr.tradingview.com/news/matriks:6795500:0"
+    },
     {
       "source": "tradingview",
       "text": "bas nda bugun 6 ekim sal",
