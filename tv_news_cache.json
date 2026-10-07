@@ -2,8 +2,10 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6795500:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45T07W:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45T07W:0",
+        "tradingview:https://tr.tradingview.com/news/matriks:6797399:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6795500:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45S09O:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45S09U:0",
@@ -145,9 +147,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1672652",
+      "last_seen_key": "kap:1674032",
       "seen_keys": [
-        "kap:1672652",
+        "kap:1674032",
         "kap:1672364",
         "kap:1671270",
         "kap:1671000",
@@ -176,6 +178,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1672652",
         "kap:1671688",
         "kap:1576402",
         "kap:1671098",
@@ -196,9 +199,9 @@
       ]
     },
     "bloomberght": {
-      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-yeni-bir-is-iliskisi-aciklamasi-3790418",
+      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-195-milyon-dolarlik-yeni-sozlesme-3790570",
       "seen_keys": [
-        "bloomberght:https://www.bloomberght.com/aselsan-dan-yeni-bir-is-iliskisi-aciklamasi-3790418"
+        "bloomberght:https://www.bloomberght.com/aselsan-dan-195-milyon-dolarlik-yeni-sozlesme-3790570"
       ]
     },
     "trthaber": {
@@ -212,9 +215,30 @@
       "seen_keys": [
         "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-1579-milyon-dolarlik-sozlesme-1745031"
       ]
+    },
+    "investing": {
+      "last_seen_key": "investing:https://tr.investing.com/news/global-filings/aselsan-ssb-ile-195-milyon-dolarlk-radar-sozlesmesi-imzalad-93CH-4093058",
+      "seen_keys": [
+        "investing:https://tr.investing.com/news/global-filings/aselsan-ssb-ile-195-milyon-dolarlk-radar-sozlesmesi-imzalad-93CH-4093058"
+      ]
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan savunma sanayii baskanl g radar sistemlerinin tedarikine iliskin 195 milyon dolarl k anlasma imzalad kap",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45T07W:0"
+    },
+    {
+      "source": "tradingview",
+      "text": "aselsan savunma sanayii baskanl g aras nda radar sistemlerinin tedarikine iliskin 195 000 000 abd dolar tutar nda sozlesme imzaland",
+      "link": "https://tr.tradingview.com/news/matriks:6797399:0"
+    },
+    {
+      "source": "kap",
+      "text": "asels yeni is iliskisi sozlesme imzalanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1674032"
+    },
     {
       "source": "tradingview",
       "text": "aselsan gm akyol alcak dunya yorungesi tak m uydu projesi olan astralink hamlesini baslatt klar n belirtti",
