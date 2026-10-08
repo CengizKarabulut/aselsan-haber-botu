@@ -150,10 +150,10 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1675546",
+      "last_seen_key": "kap:1677153",
       "seen_keys": [
+        "kap:1677153",
         "kap:1675546",
-        "kap:1672364",
         "kap:1671270",
         "kap:1671000",
         "kap:1668298",
@@ -181,6 +181,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1672364",
         "kap:1674032",
         "kap:1672652",
         "kap:1671688",
@@ -228,6 +229,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels borsada islem goren tipe donusum duyurusu donusum",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1677153"
+    },
     {
       "source": "tradingview",
       "text": "aselsan silah elektronik harp sistemlerinin ihracat na iliskin toplam tutar 125 mln olan sat s sozlesmesi imzalad kap",
