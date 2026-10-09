@@ -104,5 +104,38 @@ class AselsanFormattingTests(unittest.TestCase):
         self.assertEqual(base.SOURCE_VERSION, v2.SOURCE_VERSION)
 
 
+    def test_kap_message_contains_x_ready_share_with_source_time_and_link(self):
+        item = base.blank_item(
+            "kap",
+            "ASELS — Yeni İş İlişkisi",
+            "https://www.kap.org.tr/tr/Bildirim/999",
+            provider="ASELSAN",
+            published="2026-10-09T10:15:00+03:00",
+            summary="Şirket yeni bir sözleşme imzaladığını açıkladı.",
+            detail="Açıklama: Toplam 125 milyon USD tutarındaki sözleşme kapsamında teslimatlar 2027-2028 döneminde yapılacaktır.",
+        )
+        message = v2.build_message(item)
+        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertIn("#ASELS", message)
+        self.assertIn("Kaynak: KAP | 09.10.2026 10:15", message)
+        self.assertIn("https://www.kap.org.tr/tr/Bildirim/999", message)
+
+    def test_regular_news_message_contains_x_ready_share(self):
+        item = base.blank_item(
+            "investing",
+            "ASELSAN ihracat görünümünü değerlendirdi",
+            "https://tr.investing.com/news/example",
+            provider="Investing.com Türkiye",
+            published="2026-10-09T11:00:00+03:00",
+            summary="Şirket ihracat siparişlerinin güçlü seyrini koruduğunu belirtti.",
+            detail="Yönetim teslimat takviminin yılın son çeyreğinde yoğunlaşacağını ifade etti.",
+        )
+        message = v2.build_message(item)
+        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertIn("Kaynak: Investing.com Türkiye | 09.10.2026 11:00", message)
+        self.assertIn("https://tr.investing.com/news/example", message)
+        self.assertLessEqual(len(message), 3900)
+
+
 if __name__ == "__main__":
     unittest.main()
