@@ -165,5 +165,34 @@ class AselsanFormattingTests(unittest.TestCase):
         self.assertNotIn("SERMAYE İŞLEMİ", v2.build_message(item))
 
 
+    def test_english_only_regular_news_is_not_rendered(self):
+        item = base.blank_item(
+            "tradingview",
+            "ASELSAN signs new defense export contract",
+            "https://tr.tradingview.com/news/example/",
+            provider="Reuters",
+            published="2026-10-09T12:00:00+03:00",
+            summary="The company signed a new export contract for defense systems worth 125 million dollars.",
+            detail="The order will be delivered over the next two years.",
+        )
+        self.assertTrue(v2.is_mostly_english(item["summary"]))
+        self.assertEqual(v2.build_message(item), "")
+
+    def test_turkish_regular_news_keeps_humanized_card(self):
+        item = base.blank_item(
+            "investing",
+            "ASELSAN yeni ihracat sözleşmesini açıkladı",
+            "https://tr.investing.com/news/example",
+            provider="Investing.com Türkiye",
+            published="2026-10-09T12:00:00+03:00",
+            summary="Şirket 125 milyon dolarlık yeni ihracat sözleşmesi imzaladığını açıkladı.",
+            detail="Teslimatların iki yıl içinde yapılması planlanıyor.",
+        )
+        message = v2.build_message(item)
+        self.assertIn("ASELSAN yeni ihracat sözleşmesini açıkladı", message)
+        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertNotIn("Related Companies", message)
+
+
 if __name__ == "__main__":
     unittest.main()
