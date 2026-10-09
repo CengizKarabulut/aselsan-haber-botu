@@ -258,6 +258,89 @@ def classify_kap(item):
     return "📣", "KAP BİLDİRİMİ"
 
 
+def _x_impact_note(item):
+    text = clean(f"{item.get('title', '')} {item.get('summary', '')} {item.get('detail', '')}").lower()
+    if any(term in text for term in ("sözleşme", "sozlesme", "sipariş", "siparis", "ihale", "yeni iş ilişkisi")):
+        return "Piyasa açısından: İş hacmine katkı potansiyeli bulunmakla birlikte finansal yansıma teslimat ve gelir tahakkuk takvimine bağlıdır."
+    if any(term in text for term in ("finansal rapor", "finansal tablo", "bilanço", "bilanco", "net kâr", "net kar", "favök", "favok")):
+        return "Piyasa açısından: Sonuçların etkisi büyüme, marj, nakit akışı ve piyasa beklentileriyle birlikte değerlendirilmelidir."
+    if any(term in text for term in ("temettü", "temettu", "kâr payı", "kar payı")):
+        return "Piyasa açısından: Nakit dağıtımının paya etkisi dağıtım oranı ve ödeme takvimiyle birlikte değerlendirilmelidir."
+    if any(term in text for term in ("sermaye artır", "sermaye artir", "bedelli", "bedelsiz", "geri alım", "geri alim")):
+        return "Piyasa açısından: Sermaye ve pay başına metriklere yansıma işlemin türü ve oranına bağlıdır."
+    return ""
+
+
+def _ready_x_post(item, max_chars=1200):
+    title = clean(item.get("title")) or "ASELSAN gelişmesi"
+    published = base.format_date(item.get("published"))
+    link = clean(item.get("link"))
+    source = item.get("source", "")
+    label = "KAP" if source == "kap" else SOURCE_STYLE.get(
+        source, ("", "", base.SOURCE_LABELS.get(source, source or "Kaynak"))
+    )[2]
+
+    ticker = "ASELS"
+    subject = title
+    if " — " in title:
+        ticker, subject = [part.strip() for part in title.split(" — ", 1)]
+
+    if source == "kap":
+        kind_icon, kind_label = classify_kap(item)
+        header = f"{kind_icon} #{ticker} | {kind_label}"
+        summary = clean(item.get("summary"))
+        fields, explanation = _split_kap_detail(item.get("detail"))
+        body_parts = []
+        if summary and _plain_compare(summary) not in {_plain_compare(subject), _plain_compare(title)}:
+            body_parts.append(_excerpt(summary, 420))
+        if fields:
+            body_parts.append("Öne çıkanlar:\n" + "\n".join(
+                f"• {label}: {_excerpt(value, 180)}" for label, value in fields[:4]
+            ))
+        if explanation:
+            body_parts.append(_excerpt(explanation, 620))
+    else:
+        header = f"📌 #ASELS | {subject}"
+        summary, detail = _prepare_news_texts(item)
+        body_parts = [value for value in (summary, detail) if value]
+
+    note = _x_impact_note(item)
+    if note:
+        body_parts.append(note)
+
+    footer = f"Kaynak: {label}" + (f" | {published}" if published else "")
+    if link:
+        footer += f"\n{link}"
+
+    post = "\n\n".join([header] + body_parts + [footer])
+    if len(post) <= max_chars:
+        return post
+
+    available = max(260, max_chars - len(header) - len(footer) - 8)
+    compact = []
+    for part in body_parts:
+        if available < 80:
+            break
+        clipped = _excerpt(part, min(len(part), available))
+        if clipped:
+            compact.append(clipped)
+            available -= len(clipped) + 2
+    return "\n\n".join([header] + compact + [footer])[:max_chars].rstrip()
+
+
+def _append_x_ready(parts, item):
+    post = _ready_x_post(item)
+    if not post:
+        return parts
+    parts.extend([
+        "",
+        "━━━━━━━━━━━━━━━━━━",
+        "✍️ <b>X İÇİN HAZIR PAYLAŞIM</b>",
+        f"<blockquote>{html.escape(post)}</blockquote>",
+    ])
+    return parts
+
+
 def _fit_message(parts, limit=3900):
     message = "\n".join(parts)
     if len(message) <= limit:
@@ -306,6 +389,7 @@ def _build_kap_message(item):
             parts.extend(["", "ℹ️ <b>Detay</b>", html.escape(_excerpt(detail, 900))])
     if item.get("attachment_count"):
         parts.extend(["", f"📎 {int(item['attachment_count'])} ek"])
+    _append_x_ready(parts, item)
     parts.extend([
         "",
         f'<a href="{html.escape(item["link"], quote=True)}">KAP bildiriminin tamamını aç</a>',
@@ -336,6 +420,7 @@ def _build_news_message(item):
         parts.extend(["", "📝 <b>Özet</b>", html.escape(summary)])
     if detail:
         parts.extend(["", "ℹ️ <b>Detay</b>", html.escape(detail)])
+    _append_x_ready(parts, item)
     parts.extend([
         "",
         f'<a href="{html.escape(item["link"], quote=True)}">Haberi kaynağında aç</a>',
