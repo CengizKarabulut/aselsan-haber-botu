@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45U09W:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45V059:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45V059:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45U09W:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6801468:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45U068:0",
@@ -229,6 +230,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bas nda bugun 9 ekim cuma",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45V059:0"
+    },
     {
       "source": "kap",
       "text": "asels borsada islem goren tipe donusum duyurusu donusum",
