@@ -15,6 +15,7 @@ import aselsan_news_bot as base
 
 SOURCE_VERSION = "aselsan-multi-source-v2"
 ORIGINAL_ENRICH = base.enrich
+ORIGINAL_SEND_MESSAGE = base.send_message
 
 SOURCE_STYLE = {
     "bloomberght": ("📰", "PİYASA HABERİ", "Bloomberg HT"),
@@ -63,6 +64,51 @@ def clean(value):
     return base.clean(value)
 
 
+TR_WORDS = {
+    "ve","ile","için","bu","bir","şirket","şirketin","piyasa","borsa","yatırım","açıkladı",
+    "belirtti","yükseldi","düştü","arttı","azaldı","sözleşme","ihracat","sipariş","sermaye",
+}
+EN_WORDS = {
+    "the","and","for","with","from","to","as","a","an","of","in","on","at","company","market",
+    "shares","stock","said","says","rose","fell","revenue","profit","earnings","contract",
+    "order","export","capital","acquisition","business","defense","systems","signed","million",
+}
+
+
+def _word_tokens(value):
+    return re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]+", clean(value).lower())
+
+
+def is_mostly_english(value):
+    tokens = _word_tokens(value)
+    if len(tokens) < 5:
+        return False
+    tr = sum(token in TR_WORDS or any(ch in token for ch in "çğıöşü") for token in tokens)
+    en = sum(token in EN_WORDS for token in tokens)
+    return en >= 2 and en > tr * 1.4
+
+
+def turkish_only_text(value):
+    value = clean(value)
+    if not value or is_mostly_english(value):
+        return ""
+    value = re.sub(
+        r"(?i)\b(?:related companies|related funds|english|turkish|announcement content|"
+        r"update notification flag|correction notification flag)\b",
+        " ",
+        value,
+    )
+    return clean(value)
+
+
+def _safe_send_message(text):
+    if not clean(text):
+        print("İngilizce ağırlıklı/uygun Türkçe metin bulunamadı; Telegram gönderimi atlandı.")
+        return True
+    return ORIGINAL_SEND_MESSAGE(text)
+
+
+
 def _excerpt(value, max_chars):
     value = clean(value)
     if len(value) <= max_chars:
@@ -97,8 +143,8 @@ def _strip_title_prefix(value, title):
 
 def _prepare_news_texts(item):
     title = clean(item.get("title"))
-    summary = _strip_title_prefix(item.get("summary"), title)
-    detail = _strip_title_prefix(item.get("detail"), title)
+    summary = _strip_title_prefix(turkish_only_text(item.get("summary")), title)
+    detail = _strip_title_prefix(turkish_only_text(item.get("detail")), title)
     if summary and detail:
         summary_cmp, detail_cmp = _plain_compare(summary), _plain_compare(detail)
         if summary_cmp == detail_cmp:
@@ -293,7 +339,7 @@ def _x_impact_note(item):
 
 
 def _ready_x_post(item, max_chars=1200):
-    title = clean(item.get("title")) or "ASELSAN gelişmesi"
+    raw_title = clean(item.get("title")) or "ASELSAN gelişmesi"
     published = base.format_date(item.get("published"))
     link = clean(item.get("link"))
     source = item.get("source", "")
@@ -302,6 +348,7 @@ def _ready_x_post(item, max_chars=1200):
     )[2]
 
     ticker = "ASELS"
+    title = raw_title
     subject = title
     if " — " in title:
         ticker, subject = [part.strip() for part in title.split(" — ", 1)]
@@ -321,8 +368,12 @@ def _ready_x_post(item, max_chars=1200):
         if explanation:
             body_parts.append(_excerpt(explanation, 620))
     else:
-        header = f"📌 #ASELS | {subject}"
         summary, detail = _prepare_news_texts(item)
+        if is_mostly_english(raw_title):
+            if not summary and not detail:
+                return ""
+            subject = "ASELSAN Gelişmesi"
+        header = f"📌 #ASELS | {subject}"
         body_parts = [value for value in (summary, detail) if value]
 
     note = _x_impact_note(item)
@@ -424,10 +475,16 @@ def _build_news_message(item):
         source,
         ("📰", "HABER", base.SOURCE_LABELS.get(source, source or "Haber")),
     )
-    title = clean(item.get("title")) or "ASELSAN Haberi"
+    raw_title = clean(item.get("title")) or "ASELSAN Haberi"
     provider = clean(item.get("provider"))
     published = base.format_date(item.get("published"))
     summary, detail = _prepare_news_texts(item)
+    if is_mostly_english(raw_title):
+        if not summary and not detail:
+            return ""
+        title = "ASELSAN Gelişmesi"
+    else:
+        title = raw_title
 
     parts = [
         f"{icon} <b>{html.escape(layer)} | {html.escape(label)}</b>",
@@ -466,6 +523,7 @@ def install():
     base.enrich = enrich
     base.build_message = build_message
     base.build_activation_message = build_activation_message
+    base.send_message = _safe_send_message
 
 
 def main():
