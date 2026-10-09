@@ -160,10 +160,26 @@ def _clean_explanation(value):
     value = clean(value)
     if not value:
         return ""
-    lowered = value.lower()
-    cut_points = [lowered.find(prefix) for prefix in KAP_BOILERPLATE_STARTS if lowered.find(prefix) >= 0]
+
+    cut_points = []
+    # Türkçe açıklamanın sonunda yer alan "İngilizce çevirisi/tercümesi" ibaresi.
+    for pattern in (
+        r"işbu\s+açıklama(?:mız)?ın\s+ingilizce\s+(?:çevirisi|tercümesi)",
+        r"yukarıdaki\s+açıklamalarımızın",
+        r"we\s+proclaim\s+that\s+our\s+above\s+disclosure",
+        r"this\s+statement\s+is\s+an\s+english\s+translation",
+    ):
+        match = re.search(pattern, value, flags=re.IGNORECASE)
+        if match:
+            cut_points.append(match.start())
+
+    # KAP çift dil sütununu pipe ile ayırmışsa İngilizce sütun başlamadan kes.
+    pipe_match = re.search(r"\s*\|\s*(?=(?:The|This|Our|Company|Capital|Acquisition|English)\b)", value, flags=re.IGNORECASE)
+    if pipe_match:
+        cut_points.append(pipe_match.start())
+
     if cut_points:
-        value = value[:min(cut_points)].strip(" .·")
+        value = value[:min(cut_points)].strip(" .·|")
     return value
 
 
