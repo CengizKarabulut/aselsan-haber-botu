@@ -138,5 +138,32 @@ class AselsanFormattingTests(unittest.TestCase):
         self.assertLessEqual(len(message), 3900)
 
 
+    def test_financial_asset_kap_is_turkish_and_correctly_classified(self):
+        soup = BeautifulSoup(
+            """
+            <div class="disclosureScrollableArea">
+              <span>oda_ExplanationTextBlock1</span>
+              <span>Şirketimizin bağlı ortaklığı Cetwell'in sermayesi 100.000.000 TL'ye yükseltilmiş, 87.000.000 TL FORTE tarafından karşılanmıştır. FORTE'nin payı %93,63'e ulaşmıştır. İşbu açıklamamızın İngilizce çevirisi ekte yer almaktadır. | The share capital of Cetwell was increased and funded by FORTE.</span>
+            </div>
+            """,
+            "html.parser",
+        )
+        detail = v2.compact_kap_detail(soup)
+        self.assertIn("87.000.000 TL", detail)
+        self.assertIn("%93,63", detail)
+        self.assertNotIn("The share capital", detail)
+        item = base.blank_item(
+            "kap",
+            "FORTE — Finansal Duran Varlık Edinimi",
+            "https://www.kap.org.tr/tr/Bildirim/1678460",
+            provider="FORTE",
+            summary="Cetwell sermaye artırımına katılım",
+            detail=detail,
+        )
+        icon, label = v2.classify_kap(item)
+        self.assertEqual(label, "İŞTİRAK / FİNANSAL DURAN VARLIK")
+        self.assertNotIn("SERMAYE İŞLEMİ", v2.build_message(item))
+
+
 if __name__ == "__main__":
     unittest.main()

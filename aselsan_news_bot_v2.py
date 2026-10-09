@@ -38,6 +38,8 @@ KAP_BOILERPLATE_STARTS = (
     "we proclaim that our above disclosure",
     "burada yer alan yatırım bilgi",
     "işbu açıklamanın ingilizce tercümesi",
+    "işbu açıklamamızın ingilizce çevirisi",
+    "işbu açıklamamızın ingilizce tercümesi",
 )
 KAP_ODA_FIELDS = (
     ("oda_DefaultTransactionTransactionType", "İşlem Türü"),
@@ -46,6 +48,7 @@ KAP_ODA_FIELDS = (
     ("oda_DateOfThePreviousNotificationAboutTheSameSubject", "Önceki Açıklama"),
 )
 KAP_KIND_RULES = (
+    ("🏢", "İŞTİRAK / FİNANSAL DURAN VARLIK", ("finansal duran varlık", "iştirak", "bağlı ortaklık", "sermaye artırımına katılım")),
     ("⚠️", "TEMERRÜT İŞLEMİ", ("temerrüt", "temerrut", "default transaction")),
     ("🤝", "YENİ İŞ / SÖZLEŞME", ("yeni iş ilişkisi", "sözleşme", "sozlesme", "sipariş", "siparis", "ihale")),
     ("📊", "FİNANSAL RAPOR", ("finansal rapor", "finansal tablo", "faaliyet raporu", "bilanço", "bilanco")),
@@ -266,6 +269,8 @@ def _x_impact_note(item):
         return "Piyasa açısından: Sonuçların etkisi büyüme, marj, nakit akışı ve piyasa beklentileriyle birlikte değerlendirilmelidir."
     if any(term in text for term in ("temettü", "temettu", "kâr payı", "kar payı")):
         return "Piyasa açısından: Nakit dağıtımının paya etkisi dağıtım oranı ve ödeme takvimiyle birlikte değerlendirilmelidir."
+    if any(term in text for term in ("finansal duran varlık", "iştirak", "bağlı ortaklık", "sermaye artırımına katılım")):
+        return "Piyasa açısından: İşlemin katkısı edinilen varlığın faaliyet performansı, konsolidasyon etkisi ve sermaye kullanımına bağlıdır."
     if any(term in text for term in ("sermaye artır", "sermaye artir", "bedelli", "bedelsiz", "geri alım", "geri alim")):
         return "Piyasa açısından: Sermaye ve pay başına metriklere yansıma işlemin türü ve oranına bağlıdır."
     return ""
