@@ -105,7 +105,7 @@ class AselsanFormattingTests(unittest.TestCase):
         self.assertEqual(base.SOURCE_VERSION, v2.SOURCE_VERSION)
 
 
-    def test_kap_message_contains_x_ready_share_with_source_time_and_link(self):
+    def test_kap_message_is_news_card_without_x_share(self):
         item = base.blank_item(
             "kap",
             "ASELS — Yeni İş İlişkisi",
@@ -116,12 +116,14 @@ class AselsanFormattingTests(unittest.TestCase):
             detail="Açıklama: Toplam 125 milyon USD tutarındaki sözleşme kapsamında teslimatlar 2027-2028 döneminde yapılacaktır.",
         )
         message = v2.build_message(item)
-        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
-        self.assertIn("#ASELS", message)
-        self.assertIn("Kaynak: KAP | 09.10.2026 10:15", message)
-        self.assertIn("https://www.kap.org.tr/tr/Bildirim/999", message)
+        self.assertIn("RESMÎ | KAP | ASELS", message)
+        self.assertIn("09.10.2026 10:15", message)
+        self.assertIn("125 milyon USD", message)
+        self.assertIn("KAP bildiriminin tamamını aç", message)
+        self.assertNotIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertNotIn("<blockquote>", message)
 
-    def test_regular_news_message_contains_x_ready_share(self):
+    def test_regular_news_is_clean_telegram_card_without_x_share(self):
         item = base.blank_item(
             "investing",
             "ASELSAN ihracat görünümünü değerlendirdi",
@@ -132,9 +134,11 @@ class AselsanFormattingTests(unittest.TestCase):
             detail="Yönetim teslimat takviminin yılın son çeyreğinde yoğunlaşacağını ifade etti.",
         )
         message = v2.build_message(item)
-        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
-        self.assertIn("Kaynak: Investing.com Türkiye | 09.10.2026 11:00", message)
-        self.assertIn("https://tr.investing.com/news/example", message)
+        self.assertIn("PİYASA HABERİ | Investing.com Türkiye", message)
+        self.assertIn("09.10.2026 11:00", message)
+        self.assertIn("Haberi kaynağında aç", message)
+        self.assertNotIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertNotIn("<blockquote>", message)
         self.assertLessEqual(len(message), 3900)
 
 
@@ -190,7 +194,8 @@ class AselsanFormattingTests(unittest.TestCase):
         )
         message = v2.build_message(item)
         self.assertIn("ASELSAN yeni ihracat sözleşmesini açıkladı", message)
-        self.assertIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertNotIn("X İÇİN HAZIR PAYLAŞIM", message)
+        self.assertNotIn("<blockquote>", message)
         self.assertNotIn("Related Companies", message)
 
 
