@@ -70,7 +70,8 @@ class AselsanFormattingTests(unittest.TestCase):
         self.assertIn("📝 <b>Özet</b>", message)
         self.assertIn("ℹ️ <b>Detay</b>", message)
         self.assertEqual(message.count("PİYASA HABERİ | Bloomberg HT"), 1)
-        self.assertIn("Kaynak: Bloomberg HT", message)
+        self.assertIn("Haberi kaynağında aç", message)
+        self.assertNotIn("X İÇİN HAZIR PAYLAŞIM", message)
         self.assertIn("Haberi kaynağında aç", message)
 
     def test_tradingview_keeps_distinct_provider(self):
