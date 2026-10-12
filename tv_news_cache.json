@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6811759:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6811823:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6811823:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6811759:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45V059:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N45U09W:0",
@@ -231,6 +232,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "global md asels hedef fiyat 536 7 tl tavsiye al",
+      "link": "https://tr.tradingview.com/news/matriks:6811823:0"
+    },
     {
       "source": "tradingview",
       "text": "sirket raporu asels global menkul degerler",
