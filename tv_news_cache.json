@@ -157,8 +157,9 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1677153",
+      "last_seen_key": "kap:1680236",
       "seen_keys": [
+        "kap:1680236",
         "kap:1677153",
         "kap:1675546",
         "kap:1671270",
@@ -172,7 +173,6 @@
         "kap:1643142",
         "kap:1643141",
         "kap:1643140",
-        "kap:1635301",
         "kap:1610499",
         "kap:1610498",
         "kap:1610497",
@@ -188,6 +188,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1635301",
         "kap:1672364",
         "kap:1674032",
         "kap:1672652",
@@ -236,6 +237,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "kap",
+      "text": "asels finansal takvim finansal takvim",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1680236"
+    },
     {
       "source": "tradingview",
       "text": "piyasalarda bugun is yat r m",
