@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6815142:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6815440:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6815440:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6815142:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6815113:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6815106:0",
@@ -235,6 +236,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "piyasalarda bugun is yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6815440:0"
+    },
     {
       "source": "tradingview",
       "text": "company report asels vak f yat r m",
