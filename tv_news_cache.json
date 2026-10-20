@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N46605X:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6836356:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6836356:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N46605X:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6834022:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6832209:0",
@@ -240,6 +241,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "matriks haber bilanco haritas 3c26 bankalarda kar daralmas finans d s nda toparlanma beklentisi",
+      "link": "https://tr.tradingview.com/news/matriks:6836356:0"
+    },
     {
       "source": "tradingview",
       "text": "emlak konut aselsan is birligi protokolu kapsam nda ankara arsa sat s kars l g gelir paylas m isi sozlesmesi imzalad kap",
