@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6837272:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837272:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837186:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837148:0",
@@ -244,6 +245,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bilanco beklentileri yap kredi yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6837541:0"
+    },
     {
       "source": "tradingview",
       "text": "matriks haber anketi asels 2026 y l 3 ceyrek net donem kar n n 8 882 7 milyon tl olmas bekleniyor 2025 3c 6 182 1 milyon tl",
