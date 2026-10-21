@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6838857:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6838857:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837357:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837272:0",
@@ -246,6 +247,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "bilanco beklentileri 3 ceyrek global menkul degerler",
+      "link": "https://tr.tradingview.com/news/matriks:6838857:0"
+    },
     {
       "source": "tradingview",
       "text": "bilanco beklentileri yap kredi yat r m",
