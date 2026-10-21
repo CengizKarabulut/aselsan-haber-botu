@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6837148:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6837186:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6837186:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837148:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6836356:0",
         "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N46605X:0",
@@ -242,6 +243,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "model portfoy guncellemesi asels sokm eklerken tursg gwind c kar yoruz garanti bbva yat r m",
+      "link": "https://tr.tradingview.com/news/matriks:6837186:0"
+    },
     {
       "source": "tradingview",
       "text": "bilanco beklentileri 3 ceyrek phillipcapital",
