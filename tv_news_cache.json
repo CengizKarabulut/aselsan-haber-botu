@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6844750:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4690LQ:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4690LQ:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6844750:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6838857:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
@@ -225,9 +226,9 @@
       ]
     },
     "bloomberght": {
-      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-dan-125-milyon-dolarlik-ihracat-sozlesmesi-3790739",
+      "last_seen_key": "bloomberght:https://www.bloomberght.com/aselsan-da-yeni-is-sozlesmesi-3792386",
       "seen_keys": [
-        "bloomberght:https://www.bloomberght.com/aselsan-dan-125-milyon-dolarlik-ihracat-sozlesmesi-3790739"
+        "bloomberght:https://www.bloomberght.com/aselsan-da-yeni-is-sozlesmesi-3792386"
       ]
     },
     "trthaber": {
@@ -237,9 +238,9 @@
       ]
     },
     "ntvpara": {
-      "last_seen_key": "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-1579-milyon-dolarlik-sozlesme-1745031",
+      "last_seen_key": "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-yeni-is-sozlesmesi-1747606",
       "seen_keys": [
-        "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-1579-milyon-dolarlik-sozlesme-1745031"
+        "ntvpara:https://www.ntv.com.tr/ntvpara/aselsandan-yeni-is-sozlesmesi-1747606"
       ]
     },
     "investing": {
@@ -250,6 +251,11 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan 442 5 milyon dolarl k ihracat sozlesmesi imzalad kap",
+      "link": "https://tr.tradingview.com/news/reuters.com,2026:newsml_L8N4690LQ:0"
+    },
     {
       "source": "tradingview",
       "text": "aselsan uluslararas musterisi radar iha kars tedbir komuta kontrol sistemlerinin sat s na iliskin toplam tutar 442 5 milyon abd dolar olan ihracat sozlesmesi imzalad",
