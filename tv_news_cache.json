@@ -2,8 +2,9 @@
   "source_version": "aselsan-multi-source-v2",
   "sources": {
     "tradingview": {
-      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6838857:0",
+      "last_seen_key": "tradingview:https://tr.tradingview.com/news/matriks:6844750:0",
       "seen_keys": [
+        "tradingview:https://tr.tradingview.com/news/matriks:6844750:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6838857:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837541:0",
         "tradingview:https://tr.tradingview.com/news/matriks:6837357:0",
@@ -167,12 +168,12 @@
       ]
     },
     "kap": {
-      "last_seen_key": "kap:1685308",
+      "last_seen_key": "kap:1686331",
       "seen_keys": [
+        "kap:1686331",
         "kap:1685308",
         "kap:1680236",
         "kap:1677153",
-        "kap:1675546",
         "kap:1671270",
         "kap:1668298",
         "kap:1668268",
@@ -198,6 +199,7 @@
         "kap:1520856",
         "kap:1519678",
         "kap:1519522",
+        "kap:1675546",
         "kap:1671000",
         "kap:1635301",
         "kap:1672364",
@@ -248,6 +250,16 @@
     }
   },
   "fingerprints": [
+    {
+      "source": "tradingview",
+      "text": "aselsan uluslararas musterisi radar iha kars tedbir komuta kontrol sistemlerinin sat s na iliskin toplam tutar 442 5 milyon abd dolar olan ihracat sozlesmesi imzalad",
+      "link": "https://tr.tradingview.com/news/matriks:6844750:0"
+    },
+    {
+      "source": "kap",
+      "text": "asels yeni is iliskisi sozlesme imzalanmas",
+      "link": "https://www.kap.org.tr/tr/Bildirim/1686331"
+    },
     {
       "source": "kap",
       "text": "asels spk islem yasag nedeniyle pay duyurusu spk islem yasag nedeniyle pay duyurusu",
